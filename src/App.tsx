@@ -1,11 +1,11 @@
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-// import Signup from './pages/Signup';
+import PageRoutes from "./routes/Routes";
 
 function App() {
-  // Switch between Login and Signup to test both UIs
-//   return <Login />;
-  return <Signup/>;
+  return (
+    <>
+      <PageRoutes />
+    </>
+  );
 }
 
 export default App;
