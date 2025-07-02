@@ -1,5 +1,5 @@
-import Login from "../pages/Login";
-import Signup from "../pages/Signup";
+import Login from "../pages/AuthenticationPages/Login";
+import Signup from "../pages/AuthenticationPages/Signup";
 import {
   BrowserRouter,
   Route,

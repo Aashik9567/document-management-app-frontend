@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Mail, Lock, FileText } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 
-import { useAuthStore } from '../states/authStore';
-import { loginSchema } from '../lib/validations/auth';
-import type { LoginFormData } from '../lib/validations/auth';
-import { Input } from '../components/ui/form-field';
+import { useLogin } from '../../lib/hooks/useAuth';
+import { loginSchema } from '../../lib/validations/auth';
+import type { LoginFormData } from '../../lib/validations/auth';
+import { Input } from '../../components/ui/form-field';
+import { loginUser } from '../../endpoints/login/login';
+import { Alert, AlertDescription, AlertTitle } from '../../components/ui/alert';
 
 export default function Login() {
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const navigate = useNavigate();
+  const loginMutation = useLogin();
   const [showPassword, setShowPassword] = useState(false);
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const {
     register,
@@ -20,15 +26,32 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   });
 
-  useEffect(() => {
-    clearError();
-  }, [clearError]);
+  const { mutate, isPending, isError, isSuccess, data } = useMutation({
+    mutationFn: loginUser,
+  });
 
   const onSubmit = async (data: LoginFormData) => {
-    await login(data);
-    // For now, just log success - no navigation
-    console.log('Login successful!');
+    mutate(data);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      setAlert({ type: 'success', message: 'Login successful!' });
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
+    } else if (isError) {
+      setAlert({ type: 'error', message: 'Login failed. Please check your credentials.' });
+    }
+  }, [data, isError, isSuccess]);
+
+  // Auto-dismiss alert after 3 seconds
+  useEffect(() => {
+    if (alert) {
+      const timer = setTimeout(() => setAlert(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [alert]);
 
   return (
     <div className="min-h-screen flex">
@@ -40,22 +63,27 @@ export default function Login() {
             <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-xl bg-blue-100">
               <FileText className="h-6 w-6 text-blue-600" />
             </div>
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Welcome back
-            </h2>
+            <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome back</h2>
             <p className="mt-2 text-sm text-gray-600">
               Sign in to your account to continue
             </p>
           </div>
 
+          {/* Alert for mutation */}
+          {alert && (
+            <Alert variant={alert.type === 'success' ? 'default' : 'destructive'} className="mb-4">
+              {alert.type === 'success' ? (
+                <CheckCircle className="h-4 w-4" />
+              ) : (
+                <AlertCircle className="h-4 w-4" />
+              )}
+              <AlertTitle>{alert.type === 'success' ? 'Success' : 'Error'}</AlertTitle>
+              <AlertDescription>{alert.message}</AlertDescription>
+            </Alert>
+          )}
+
           {/* Form */}
           <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-
             <div className="space-y-4">
               {/* Email */}
               <div>
@@ -144,10 +172,10 @@ export default function Login() {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isPending || loginMutation.isPending}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? (
+              {(isPending || loginMutation.isPending) ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Signing in...
@@ -164,9 +192,8 @@ export default function Login() {
                 <a
                   href="#"
                   className="font-medium text-blue-600 hover:text-blue-500"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log('Sign up clicked');
+                  onClick={() => {
+                    navigate("/signup");
                   }}
                 >
                   Sign up
@@ -182,9 +209,7 @@ export default function Login() {
         <div className="flex items-center justify-center h-full p-12">
           <div className="max-w-md text-center text-white">
             <FileText className="h-20 w-20 mx-auto mb-8" />
-            <h3 className="text-2xl font-bold mb-4">
-              Document Management Made Simple
-            </h3>
+            <h3 className="text-2xl font-bold mb-4">Document Management Made Simple</h3>
             <p className="text-blue-100">
               Create, manage, and organize all your business documents in one place. 
               From NDAs to offer letters, we've got you covered.
