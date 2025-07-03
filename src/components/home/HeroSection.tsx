@@ -3,7 +3,7 @@ import { ArrowRight, FileText, Download, Clock, Shield } from 'lucide-react';
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
+    <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-emerald-900 to-indigo-900 overflow-hidden">
       {/* Animated Wave Background */}
       <div className="absolute inset-0">
         <svg 
@@ -31,7 +31,7 @@ const HeroSection = () => {
       {/* Floating Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-bounce delay-300"></div>
-        <div className="absolute top-40 right-20 w-16 h-16 bg-purple-400/20 rounded-full blur-lg animate-bounce delay-500"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-emerald-400/20 rounded-full blur-lg animate-bounce delay-500"></div>
         <div className="absolute bottom-40 left-20 w-24 h-24 bg-blue-400/20 rounded-full blur-xl animate-bounce delay-700"></div>
       </div>
 
@@ -49,7 +49,7 @@ const HeroSection = () => {
               
               <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
                 Create Professional 
-                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
                   {" "}Documents{" "}
                 </span>
                 in Minutes
@@ -79,7 +79,7 @@ const HeroSection = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+              <button className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -111,7 +111,7 @@ const HeroSection = () => {
             <div className="relative z-10">
               {/* Main Document Image */}
               <div className="relative mx-auto max-w-md">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 rounded-2xl blur-2xl transform rotate-6"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-emerald-400/20 rounded-2xl blur-2xl transform rotate-6"></div>
                 <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
                   <img 
                     src={documentImage }

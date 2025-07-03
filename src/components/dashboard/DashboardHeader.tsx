@@ -25,7 +25,7 @@ export default function DashboardHeader() {
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem('auth-token');
+    localStorage.removeItem('token');
     navigate('/login');
   };
 

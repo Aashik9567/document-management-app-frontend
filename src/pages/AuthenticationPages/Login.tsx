@@ -1,4 +1,4 @@
-import {  useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Mail, Lock, FileText } from 'lucide-react';
@@ -27,35 +27,31 @@ export default function Login() {
  const { mutate, isPending } = useMutation({
     mutationFn: loginUser,
     onSuccess: (response) => {
-      // Store user and token in Zustand store
-      // Based on your API response structure
       const { userWithoutPassword, token, message } = response;
       
       if (userWithoutPassword && token) {
-        setAuth(userWithoutPassword, token);
+        setAuth(userWithoutPassword,token);
+        localStorage.setItem('token', token); // Store token in localStorage
         toast.success(message || 'Login successful!');
         setTimeout(() => {
           navigate('/dashboard');
         }, 1000);
       }
     },
-    onError: (error: any) => {
-      // Extract error message from response
-      let errorMessage = 'Login failed. Please check your credentials.';
-      
-      if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
-      
-     toast.error(errorMessage);
+    onError: (error:any) => {
+      toast.error(error?.response?.data?.error || 'Login failed. Please try again.');
     }
   });
 
   const onSubmit = async (data: LoginFormData) => {
     mutate(data);
   };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
 
   return (
