@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { User, LogOut, Settings, Bell, Search } from 'lucide-react';
+import { User, LogOut, Settings , Search } from 'lucide-react';
 import { useAuthStore } from '../../states/authStore';
 import { useNavigate } from 'react-router-dom';
 
@@ -67,14 +67,7 @@ export default function DashboardHeader() {
 
         {/* Right side - Notifications and User Menu */}
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full">
-            <span className="sr-only">View notifications</span>
-            <Bell className="h-6 w-6" />
-            {/* Notification badge */}
-            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
-          </button>
-
+         
           {/* User Menu */}
           <div className="relative" ref={dropdownRef}>
             <button
