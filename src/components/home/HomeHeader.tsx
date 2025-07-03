@@ -8,14 +8,14 @@ export default function HomeHeader() {
 
   const navItems = [
     { name: 'Features', href: '#features' },
-    { name: 'How it Works', href: '#how-it-works' },
+    { name: 'How it Works', href: '/howitworks' },
     { name: 'Pricing', href: '#pricing' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
     <header className="relative bg-white shadow-sm">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">

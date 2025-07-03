@@ -1,7 +1,9 @@
 import documentImage from '../../assets/document.png';
 import { ArrowRight, FileText, Download, Clock, Shield } from 'lucide-react';
+import {useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-emerald-900 to-indigo-900 overflow-hidden">
       {/* Animated Wave Background */}
@@ -37,7 +39,7 @@ const HeroSection = () => {
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen">
+        <div className="grid lg:grid-cols-2 gap-32 items-center min-h-screen">
           
           {/* Left Content */}
           <div className="space-y-8">
@@ -79,7 +81,7 @@ const HeroSection = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+              <button onClick={()=> navigate('/login')} className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>

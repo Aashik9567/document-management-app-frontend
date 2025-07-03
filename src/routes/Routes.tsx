@@ -9,6 +9,8 @@ import {
 import Home from "../pages/HomePages/Home";
 import Dashboard from "../pages/DashboardPages/Dashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
+import HowItWorksSection from "../components/home/HowItWorksSection";
+import ContactSection from "../components/home/ContactSection";
 
 const PageRoutes = () => {
   return (
@@ -16,6 +18,8 @@ const PageRoutes = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/howitworks" element={<HowItWorksSection />} />
+          <Route path="/contact" element={<ContactSection />} />
           {/* Define other routes here */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
