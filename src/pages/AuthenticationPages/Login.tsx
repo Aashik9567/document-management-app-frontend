@@ -1,23 +1,21 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Mail, Lock, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-
-import { useLogin } from '../../lib/hooks/useAuth';
 import { loginSchema } from '../../lib/validations/auth';
 import type { LoginFormData } from '../../lib/validations/auth';
 import { Input } from '../../components/ui/form-field';
 import { loginUser } from '../../endpoints/login/login';
-import { Alert, AlertDescription, AlertTitle } from '../../components/ui/alert';
+import { toast } from 'sonner'; 
+import { useAuthStore } from '../../states/authStore'; // Import your auth store
 
 export default function Login() {
   const navigate = useNavigate();
-  const loginMutation = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
+  const { setAuth } = useAuthStore();
   const {
     register,
     handleSubmit,
@@ -26,32 +24,39 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   });
 
-  const { mutate, isPending, isError, isSuccess, data } = useMutation({
+ const { mutate, isPending } = useMutation({
     mutationFn: loginUser,
+    onSuccess: (response) => {
+      // Store user and token in Zustand store
+      // Based on your API response structure
+      const { userWithoutPassword, token, message } = response;
+      
+      if (userWithoutPassword && token) {
+        setAuth(userWithoutPassword, token);
+        toast.success(message || 'Login successful!');
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      }
+    },
+    onError: (error: any) => {
+      // Extract error message from response
+      let errorMessage = 'Login failed. Please check your credentials.';
+      
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+     toast.error(errorMessage);
+    }
   });
 
   const onSubmit = async (data: LoginFormData) => {
     mutate(data);
   };
 
-  useEffect(() => {
-    if (isSuccess) {
-      setAlert({ type: 'success', message: 'Login successful!' });
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    } else if (isError) {
-      setAlert({ type: 'error', message: 'Login failed. Please check your credentials.' });
-    }
-  }, [data, isError, isSuccess]);
-
-  // Auto-dismiss alert after 3 seconds
-  useEffect(() => {
-    if (alert) {
-      const timer = setTimeout(() => setAlert(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [alert]);
 
   return (
     <div className="min-h-screen flex">
@@ -69,18 +74,6 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Alert for mutation */}
-          {alert && (
-            <Alert variant={alert.type === 'success' ? 'default' : 'destructive'} className="mb-4">
-              {alert.type === 'success' ? (
-                <CheckCircle className="h-4 w-4" />
-              ) : (
-                <AlertCircle className="h-4 w-4" />
-              )}
-              <AlertTitle>{alert.type === 'success' ? 'Success' : 'Error'}</AlertTitle>
-              <AlertDescription>{alert.message}</AlertDescription>
-            </Alert>
-          )}
 
           {/* Form */}
           <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -172,10 +165,10 @@ export default function Login() {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={isPending || loginMutation.isPending}
+              disabled={isPending }
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {(isPending || loginMutation.isPending) ? (
+              {(isPending ) ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Signing in...

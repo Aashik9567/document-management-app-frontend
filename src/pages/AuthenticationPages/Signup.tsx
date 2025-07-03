@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Mail, Lock, User, FileText, Phone, Camera, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, FileText, Phone, Camera, X } from 'lucide-react';
 import { signupSchema } from '../../lib/validations/auth';
 import type { SignupFormData } from '../../lib/validations/auth';
 import { Input } from '../../components/ui/form-field';
-import { Alert, AlertDescription } from '../../components/ui/alert';
 import { convertFileToBase64 } from '../../utils/fileUtils';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { registerUser } from '../../endpoints/register/register';
+import { toast } from 'sonner'; 
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -147,21 +147,12 @@ export default function Signup() {
             <p className="mt-2 text-sm text-gray-600">Start your document management journey</p>
           </div>
 
-          {/* Alerts */}
           {isSuccess && (
-            <Alert className="border-green-200 bg-green-50">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
-                Account created successfully! Redirecting to login page...
-              </AlertDescription>
-            </Alert>
+            toast.success('Account created successfully!!!')
           )}
 
           {isError && (
-            <Alert className="border-red-200 bg-red-50">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">{getErrorMessage()}</AlertDescription>
-            </Alert>
+            toast.error(getErrorMessage())
           )}
 
           {/* Form */}

@@ -6,20 +6,22 @@ export interface LoginRequest {
   password: string;
 }
 
+// Updated to match your actual API response structure
 export interface LoginResponse {
-  success: boolean;
   message: string;
-  data: {
-    user: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-      phone?: string;
-      profileImage?: string;
-      createdAt: string;
-    };
-    token: string;
+  token: string;
+  userWithoutPassword: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    profileImage: string;
+    totalDocuments: number;
+    isVerified: boolean;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
   };
 }
 
@@ -27,4 +29,3 @@ export const loginUser = async (data: LoginFormData): Promise<LoginResponse> => 
   const response = await apiClient.post<LoginResponse>('/api/auth/login', data);
   return response.data;
 };
-
