@@ -2,7 +2,7 @@ import { useAuthStore } from '../../states/authStore';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import QuickActions from '../../components/dashboard/QuickActions';
 import RecentActivity from '../../components/dashboard/RecentActivity';
-import { Calendar, TrendingUp } from 'lucide-react';
+import { Calendar} from 'lucide-react';
 
 export default function Dashboard() {
   const { user } = useAuthStore();
@@ -18,7 +18,7 @@ export default function Dashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 rounded-xl shadow-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-700 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold mb-2">
@@ -37,10 +37,7 @@ export default function Dashboard() {
                     day: 'numeric' 
                   })}</span>
                 </div>
-                <div className="flex items-center">
-                  <TrendingUp className="h-4 w-4 mr-1" />
-                  <span>+23% activity this week</span>
-                </div>
+
               </div>
             </div>
             <div className="hidden md:block">
