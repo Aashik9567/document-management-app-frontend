@@ -1,6 +1,5 @@
 import { useAuthStore } from '../../states/authStore';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
-import StatsCards from '../../components/dashboard/StatsCards';
 import QuickActions from '../../components/dashboard/QuickActions';
 import RecentActivity from '../../components/dashboard/RecentActivity';
 import { Calendar, TrendingUp } from 'lucide-react';
@@ -53,9 +52,6 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-        {/* Stats Cards */}
-        <StatsCards />
 
         {/* Quick Actions and Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

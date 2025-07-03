@@ -5,7 +5,6 @@ import {
   Plus, 
   Users, 
   Settings, 
-  BarChart3, 
   Folder, 
   Notebook,
   History,
@@ -62,13 +61,6 @@ export default function DashboardSidebar() {
         { name: 'Contracts', path: '/dashboard/templates/contracts', icon: FileText },
         { name: 'Offer Letters', path: '/dashboard/templates/offers', icon: Mail },
       ]
-    },
-    {
-      id: 'analytics',
-      name: 'Analytics',
-      icon: BarChart3,
-      path: '/dashboard/analytics',
-      children: []
     },
     {
       id: 'team',
