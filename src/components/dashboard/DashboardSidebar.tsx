@@ -96,7 +96,7 @@ export default function DashboardSidebar() {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1.5 rounded-lg">
                 <FileText className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">DocuFlow</span>
+              <a href='/' className="text-xl font-bold text-gray-900">DocuFlow</a>
             </div>
           )}
           

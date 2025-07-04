@@ -1,5 +1,5 @@
 import {  useState, createContext, useContext } from 'react';
-import { Menu, X } from 'lucide-react';
+import { FileText, Menu, X } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import DashboardSidebar from './DashboardSidebar';
 
@@ -35,65 +35,73 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarContext.Provider value={{ isCollapsed, isMobileOpen, toggleCollapsed, toggleMobile }}>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
         {/* Mobile sidebar overlay */}
         {isMobileOpen && (
           <div 
-            className="fixed inset-0 z-40 lg:hidden"
+            className="fixed inset-0 z-40 lg:hidden bg-black/60 backdrop-blur-sm"
             onClick={toggleMobile}
-          >
-            <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
-          </div>
+          />
         )}
 
         {/* Mobile sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:hidden ${
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <span className="text-lg font-semibold">DocuFlow</span>
-            <button
-              onClick={toggleMobile}
-              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <DashboardSidebar />
-        </div>
-
-        {/* Desktop sidebar */}
-        <div className={`hidden lg:flex lg:flex-shrink-0 transition-all duration-300 ${sidebarWidth}`}>
-          <div className={`flex flex-col ${sidebarWidth} transition-all duration-300`}>
+          <div className="h-full bg-white/95 backdrop-blur-xl border-r border-white/20 shadow-2xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <div className="flex items-center space-x-2">
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-1.5 rounded-xl shadow-lg">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">DocuFlow</span>
+              </div>
+              <button
+                onClick={toggleMobile}
+                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
             <DashboardSidebar />
           </div>
         </div>
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        {/* Desktop sidebar - FIXED POSITION */}
+        <div className={`hidden lg:block fixed inset-y-0 left-0 z-30 transition-all duration-300 ${sidebarWidth}`}>
+          <div className="h-full bg-white/95 backdrop-blur-xl border-r border-white/20 shadow-xl">
+            <DashboardSidebar />
+          </div>
+        </div>
+
+        {/* Main content with left margin for desktop sidebar */}
+        <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
           {/* Mobile header with menu button */}
-          <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+          <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/20 bg-white/95 backdrop-blur-xl">
             <button
               onClick={toggleMobile}
-              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <span className="text-lg font-semibold">DocuFlow</span>
-            <div className="w-9"></div> {/* Spacer for centering */}
+            <div className="flex items-center space-x-2">
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-1.5 rounded-xl shadow-lg">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">DocuFlow</span>
+            </div>
+            <div className="w-9"></div>
           </div>
 
           <DashboardHeader />
           
-          <main className="flex-1 overflow-auto">
-            <div className="py-6">
-              <div className={`max-w-full mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300`}>
-                {children}
-               </div>
-              </div>
-            </main>
-          </div>
+          <main className="flex overflow-auto">
+            <div className="p-6">
+              {children}
+            </div>
+          </main>
         </div>
+      </div>
     </SidebarContext.Provider>
-  )
+  );
 }

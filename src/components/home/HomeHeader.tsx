@@ -25,7 +25,7 @@ export default function HomeHeader() {
       return (
         <button
           onClick={() => navigate('/dashboard')}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
         >
           Dashboard
         </button>
@@ -41,7 +41,7 @@ export default function HomeHeader() {
         </button>
         <button
           onClick={() => navigate('/signup')}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
+          className="bg-blue-600  text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
         >
           Get Started
         </button>
