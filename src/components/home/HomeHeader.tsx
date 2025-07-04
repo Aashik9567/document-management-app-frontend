@@ -1,10 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileText, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function HomeHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is authenticated (e.g., token exists)
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   const navItems = [
     { name: 'Features', href: '#features' },
@@ -13,8 +20,75 @@ export default function HomeHeader() {
     { name: 'Contact', href: '/contact' },
   ];
 
+  const renderAuthButtons = () => {
+    if (isLoggedIn) {
+      return (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
+        >
+          Dashboard
+        </button>
+      );
+    }
+    return (
+      <>
+        <button
+          onClick={() => navigate('/login')}
+          className="text-gray-600 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-colors"
+        >
+          Login
+        </button>
+        <button
+          onClick={() => navigate('/signup')}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
+        >
+          Get Started
+        </button>
+      </>
+    );
+  };
+
+  const renderMobileAuthButtons = () => {
+    if (isLoggedIn) {
+      return (
+        <button
+          onClick={() => {
+            navigate('/dashboard');
+            setIsMenuOpen(false);
+          }}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:from-blue-700 hover:to-purple-700 transition-all mx-3"
+        >
+          Dashboard
+        </button>
+      );
+    }
+    return (
+      <>
+        <button
+          onClick={() => {
+            navigate('/login');
+            setIsMenuOpen(false);
+          }}
+          className="text-gray-600 hover:text-blue-600 px-3 py-2 text-base font-medium text-left"
+        >
+          Login
+        </button>
+        <button
+          onClick={() => {
+            navigate('/signup');
+            setIsMenuOpen(false);
+          }}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:from-blue-700 hover:to-purple-700 transition-all mx-3"
+        >
+          Get Started
+        </button>
+      </>
+    );
+  };
+
   return (
-    <header className="relative bg-white shadow-sm">
+    <header className="bg-white shadow-sm">
       <nav className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -23,7 +97,7 @@ export default function HomeHeader() {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
                 <FileText className="h-8 w-8 text-white" />
               </div>
-              <a href='/' className="ml-3 text-xl font-bold text-gray-900">DocuFlow</a>
+              <a href="/" className="ml-3 text-xl font-bold text-gray-900">DocuFlow</a>
             </div>
           </div>
 
@@ -44,18 +118,7 @@ export default function HomeHeader() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <button
-              onClick={() => navigate('/login')}
-              className="text-gray-600 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-colors"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => navigate('/signup')}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
-            >
-              Get Started
-            </button>
+            {renderAuthButtons()}
           </div>
 
           {/* Mobile menu button */}
@@ -63,6 +126,7 @@ export default function HomeHeader() {
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-600 hover:text-gray-900 p-2"
+              aria-label="Toggle menu"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -85,18 +149,7 @@ export default function HomeHeader() {
               ))}
               <div className="pt-4 pb-3 border-t border-gray-200">
                 <div className="flex flex-col space-y-3">
-                  <button
-                    onClick={() => navigate('/login')}
-                    className="text-gray-600 hover:text-blue-600 px-3 py-2 text-base font-medium text-left"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => navigate('/signup')}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:from-blue-700 hover:to-purple-700 transition-all mx-3"
-                  >
-                    Get Started
-                  </button>
+                  {renderMobileAuthButtons()}
                 </div>
               </div>
             </div>

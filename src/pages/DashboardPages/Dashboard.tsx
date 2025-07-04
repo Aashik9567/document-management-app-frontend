@@ -18,7 +18,7 @@ export default function Dashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-700 rounded-xl shadow-lg p-6 text-white">
+        <div className="bg-blue-500 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold mb-2">
@@ -57,7 +57,7 @@ export default function Dashboard() {
         </div>
 
         {/* Additional Widgets */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1">
           {/* Document Templates */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Templates</h3>
@@ -71,55 +71,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Team Activity */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Team Activity</h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  JD
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">John Doe</p>
-                  <p className="text-xs text-gray-500">Created 2 documents</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  JS
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Jane Smith</p>
-                  <p className="text-xs text-gray-500">Shared 1 contract</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Storage & Usage */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Storage & Usage</h3>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">Documents</span>
-                  <span className="font-medium">24 files</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '60%' }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">Storage</span>
-                  <span className="font-medium">2.3 GB / 5 GB</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-purple-500 h-2 rounded-full" style={{ width: '46%' }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </DashboardLayout>

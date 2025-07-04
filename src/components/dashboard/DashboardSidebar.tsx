@@ -6,23 +6,27 @@ import {
   Users, 
   Settings, 
   Folder, 
-  Notebook,
+  Layout,  // Replace Template
   History,
   Star,
   ChevronDown,
-  ChevronRight,
-  File,
+  FileCheck,  // Replace FileContract
   Mail,
-  Share2
+  Share2,
+  ChevronUp,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSidebar } from './DashboardLayout';
 
 export default function DashboardSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isCollapsed} = useSidebar();
   const [expandedItems, setExpandedItems] = useState<string[]>(['documents']);
 
   const toggleExpanded = (item: string) => {
+    if (isCollapsed) return; // Don't expand when collapsed
+    
     setExpandedItems(prev => 
       prev.includes(item) 
         ? prev.filter(i => i !== item)
@@ -53,11 +57,11 @@ export default function DashboardSidebar() {
     {
       id: 'templates',
       name: 'Templates',
-      icon: Notebook,
+      icon: Layout,  // Changed from Template
       path: '/dashboard/templates',
       children: [
-        { name: 'All Templates', path: '/dashboard/templates', icon: Notebook },
-        { name: 'NDAs', path: '/dashboard/templates/nda', icon: File },
+        { name: 'All Templates', path: '/dashboard/templates', icon: Layout },  // Changed from Template
+        { name: 'NDAs', path: '/dashboard/templates/nda', icon: FileCheck },  // Changed from FileContract
         { name: 'Contracts', path: '/dashboard/templates/contracts', icon: FileText },
         { name: 'Offer Letters', path: '/dashboard/templates/offers', icon: Mail },
       ]
@@ -83,52 +87,79 @@ export default function DashboardSidebar() {
   };
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
+    <div className="bg-white border-r border-gray-200 flex flex-col h-full relative">
+      {/* Logo Section */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          {!isCollapsed && (
+            <div className="flex items-center space-x-2">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1.5 rounded-lg">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">DocuFlow</span>
+            </div>
+          )}
+          
+          {isCollapsed && (
+            <div className="mx-auto bg-gradient-to-r from-blue-600 to-purple-600 p-1.5 rounded-lg">
+              <FileText className="h-6 w-6 text-white" />
+            </div>
+          )}
+
+ 
+        </div>
+      </div>
+
       {/* Create Button */}
       <div className="p-4">
         <button
           onClick={() => navigate('/dashboard/create')}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all flex items-center justify-center space-x-2 group"
+          className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:from-blue-700 hover:to-purple-700 transition-all flex items-center justify-center group rounded-lg ${
+            isCollapsed ? 'p-3' : 'px-4 py-3 space-x-2'
+          }`}
+          title={isCollapsed ? 'Create Document' : ''}
         >
-          <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform" />
-          <span>Create Document</span>
+          <Plus className={`${isCollapsed ? 'h-5 w-5' : 'h-5 w-5'} group-hover:rotate-90 transition-transform`} />
+          {!isCollapsed && <span>Create Document</span>}
         </button>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-4 pb-4 space-y-1">
+      <nav className="flex-1 px-4 pb-4 space-y-1 overflow-y-auto">
         {menuItems.map((item) => (
           <div key={item.id}>
             {/* Main Menu Item */}
             <button
               onClick={() => {
-                if (item.children.length > 0) {
+                if (item.children.length > 0 && !isCollapsed) {
                   toggleExpanded(item.id);
                 } else {
                   navigate(item.path);
                 }
               }}
-              className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`w-full flex items-center text-sm font-medium rounded-lg transition-colors group ${
                 isActive(item.path)
-                  ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
+                  ? 'bg-blue-50 text-blue-700'
                   : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+              } ${isCollapsed ? 'justify-center p-3' : 'justify-between px-3 py-2'}`}
+              title={isCollapsed ? item.name : ''}
             >
-              <div className="flex items-center space-x-3">
-                <item.icon className={`h-5 w-5 ${isActive(item.path) ? 'text-blue-600' : 'text-gray-400'}`} />
-                <span>{item.name}</span>
+              <div className={`flex items-center ${isCollapsed ? '' : 'space-x-3'}`}>
+                <item.icon className={`h-5 w-5 ${isActive(item.path) ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                {!isCollapsed && <span>{item.name}</span>}
               </div>
-              {item.children.length > 0 && (
+              
+              {!isCollapsed && item.children.length > 0 && (
                 expandedItems.includes(item.id) ? (
                   <ChevronDown className="h-4 w-4 text-gray-400" />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                  <ChevronUp className="h-4 w-4 text-gray-400 transform rotate-180" />
                 )
               )}
             </button>
 
-            {/* Submenu Items */}
-            {item.children.length > 0 && expandedItems.includes(item.id) && (
+            {/* Submenu Items - Only show when not collapsed */}
+            {!isCollapsed && item.children.length > 0 && expandedItems.includes(item.id) && (
               <div className="ml-4 mt-1 space-y-1">
                 {item.children.map((child) => (
                   <button
@@ -152,21 +183,16 @@ export default function DashboardSidebar() {
         ))}
       </nav>
 
-      {/* Bottom Section - Storage */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Storage</span>
-            <span className="text-xs text-gray-500">2.3 GB / 5 GB</span>
+      {/* Collapsed Storage Indicator */}
+      {isCollapsed && (
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex justify-center">
+            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+              <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style={{ width: '46%' }}></div>
-          </div>
-          <button className="text-xs text-blue-600 hover:text-blue-700 mt-2">
-            Upgrade Plan
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
