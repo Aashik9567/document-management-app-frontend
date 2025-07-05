@@ -5,6 +5,7 @@ import RecentActivity from '../../components/dashboard/RecentActivity';
 import { Calendar, FileText, Sparkles, ChevronRight,  Target, BarChart3 } from 'lucide-react';
 import UserDocument from '../../components/dashboard/UserDocument';
 
+
 export default function Dashboard() {
   const { user } = useAuthStore();
 
@@ -144,6 +145,9 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
+         <div className="flex-1">
+        {/* Nested routes will render here */}
+      </div>
       </div>
     </DashboardLayout>
   );
