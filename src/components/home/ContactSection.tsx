@@ -48,7 +48,7 @@ export default function ContactSection() {
     {
       icon: Mail,
       title: 'Email Us',
-      content: 'hello@docuflow.com',
+      content: 'hello@DocuMate.com',
       description: 'Send us an email anytime',
       color: 'from-blue-500 to-blue-600'
     },

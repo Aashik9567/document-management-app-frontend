@@ -53,7 +53,7 @@ export default function HowItWorksSection() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 text-sm font-medium mb-4">
             <Play className="h-4 w-4 mr-2" />
-            How DocuFlow Works
+            How DocuMate Works
           </div>
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             Create Professional Documents in
@@ -199,7 +199,7 @@ export default function HowItWorksSection() {
               Ready to streamline your document workflow?
             </h3>
             <p className="text-gray-600 mb-6">
-              Join thousands of professionals who save hours every week with DocuFlow
+              Join thousands of professionals who save hours every week with DocuMate
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105">

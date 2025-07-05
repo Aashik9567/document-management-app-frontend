@@ -97,7 +97,7 @@ export default function HomeHeader() {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
                 <FileText className="h-8 w-8 text-white" />
               </div>
-              <a href="/" className="ml-3 text-xl font-bold text-gray-900">DocuFlow</a>
+              <a href="/" className="ml-3 text-xl font-bold text-gray-900">DocuMate</a>
             </div>
           </div>
 

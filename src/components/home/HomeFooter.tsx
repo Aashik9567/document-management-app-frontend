@@ -58,7 +58,7 @@ export default function HomeFooter() {
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
                   <FileText className="h-8 w-8 text-white" />
                 </div>
-                <span className="ml-3 text-2xl font-bold">DocuFlow</span>
+                <span className="ml-3 text-2xl font-bold">DocuMate</span>
               </div>
               <p className="text-gray-300 mb-6 leading-relaxed">
                 The modern way to create, manage, and share professional documents. 
@@ -69,7 +69,7 @@ export default function HomeFooter() {
               <div className="space-y-3">
                 <div className="flex items-center text-gray-300">
                   <Mail className="h-5 w-5 mr-3" />
-                  <span>docuflow@docuflow.com</span>
+                  <span>DocuMate@DocuMate.com</span>
                 </div>
                 <div className="flex items-center text-gray-300">
                   <Phone className="h-5 w-5 mr-3" />
@@ -137,7 +137,7 @@ export default function HomeFooter() {
             <div className="flex flex-col lg:flex-row justify-between items-center">
               {/* Copyright */}
               <div className="text-gray-400 text-sm mb-4 lg:mb-0">
-                © 2025 DocuFlow. All rights reserved.
+                © 2025 DocuMate. All rights reserved.
               </div>
 
               {/* Social Links */}

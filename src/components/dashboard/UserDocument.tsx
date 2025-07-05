@@ -81,15 +81,15 @@ export default function UserDocument() {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-50 text-green-700 border-green-200';
       case 'draft':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
       case 'archived':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-50 text-gray-700 border-gray-200';
       case 'published':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
@@ -125,7 +125,7 @@ export default function UserDocument() {
 
   if (isLoading) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl shadow-2xl shadow-black/5">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
         <div className="p-8">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded-lg w-1/3"></div>
@@ -142,10 +142,10 @@ export default function UserDocument() {
 
   if (error) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl shadow-2xl shadow-black/5">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
         <div className="p-8">
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-r from-red-100 to-red-200 mb-6">
+            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-red-100 mb-6">
               <FileText className="h-10 w-10 text-red-500" />
             </div>
             <h4 className="text-lg font-semibold text-gray-900 mb-2">Error loading documents</h4>
@@ -154,7 +154,7 @@ export default function UserDocument() {
             </p>
             <button 
               onClick={() => refetch()}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
             >
               Try Again
             </button>
@@ -165,17 +165,16 @@ export default function UserDocument() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl shadow-2xl shadow-black/5">
-      
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
       {/* Header */}
-      <div className="relative flex flex-col space-y-6 p-8 pb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 shadow-lg">
-              <FolderOpen className="h-5 w-5 text-white" />
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-purple-500 text-white shadow-md">
+              <FolderOpen className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <h3 className="text-xl font-bold text-gray-900">
                 My Documents
               </h3>
               <p className="text-sm text-gray-600 mt-1">
@@ -183,7 +182,7 @@ export default function UserDocument() {
               </p>
             </div>
           </div>
-          <button className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500 text-white font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg">
+          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-all shadow-sm">
             <Plus className="h-4 w-4" />
             New Document
           </button>
@@ -198,15 +197,15 @@ export default function UserDocument() {
               placeholder="Search documents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/20 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
             />
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <select
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value as any)}
-              className="px-4 py-2.5 rounded-xl border border-white/20 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+              className="px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50 shadow-sm"
             >
               {filterOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -218,19 +217,19 @@ export default function UserDocument() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-4 py-2.5 rounded-xl border border-white/20 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+              className="px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50 shadow-sm"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
               <option value="name">Name A-Z</option>
             </select>
             
-            <div className="flex rounded-xl border border-white/20 bg-white/50 backdrop-blur-sm overflow-hidden">
+            <div className="flex rounded-xl border border-gray-200 overflow-hidden shadow-sm bg-gray-50">
               <button
                 onClick={() => setViewMode('grid')}
                 className={cn(
                   "p-2.5 transition-colors",
-                  viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:text-gray-900'
+                  viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 )}
               >
                 <Grid3X3 className="h-4 w-4" />
@@ -239,7 +238,7 @@ export default function UserDocument() {
                 onClick={() => setViewMode('list')}
                 className={cn(
                   "p-2.5 transition-colors",
-                  viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:text-gray-900'
+                  viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 )}
               >
                 <List className="h-4 w-4" />
@@ -250,10 +249,10 @@ export default function UserDocument() {
       </div>
 
       {/* Documents Content */}
-      <div className="relative p-8 pt-0">
+      <div className="p-6">
         {sortedDocuments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-r from-gray-100 to-gray-200 mb-6">
+            <div className="flex items-center justify-center w-24 h-24 rounded-3xl bg-gray-100 mb-6 shadow-md">
               <FileText className="h-12 w-12 text-gray-400" />
             </div>
             <h4 className="text-xl font-semibold text-gray-900 mb-2">
@@ -265,85 +264,93 @@ export default function UserDocument() {
                 : 'Get started by creating your first document. Choose from templates or start from scratch.'
               }
             </p>
-            <button className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-medium rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg">
+            <button className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-medium rounded-xl hover:bg-blue-600 transition-all shadow-sm">
               <Plus className="h-4 w-4" />
               Create Your First Document
             </button>
           </div>
         ) : (
-         <div
-  className={cn(
-    "grid gap-6",
-    viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'
-  )}
->
-  {sortedDocuments.map((document) => (
-    <div
-      key={document.id}
-      className="group relative flex flex-col rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md p-6 overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.01]"
-    >
-      {/* Top Section: Icon & Status */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3 max-w-[75%]">
-          <div className="text-2xl shrink-0">
-            {getDocumentIcon(document.documentType.name)}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-base truncate">
-              {document.title}
-            </h4>
-            <p className="text-sm text-gray-500 capitalize truncate">
-              {document.documentType.name}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <div className={cn(
-            "px-2 py-1 rounded-full text-xs font-medium border whitespace-nowrap",
-            getStatusColor(document.status)
-          )}>
-            {document.status}
-          </div>
-    
-        </div>
-      </div>
+          <div
+            className={cn(
+              "grid gap-6",
+              viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'
+            )}
+          >
+            {sortedDocuments.map((document) => (
+              <div
+                key={document.id}
+                className="group relative flex flex-col rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all"
+              >
+                {/* Top Section: Icon & Status */}
+                <div className="flex items-start justify-between p-5 border-b border-gray-100">
+                  <div className="flex items-center gap-3 max-w-[75%]">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-100 text-2xl shadow-sm">
+                      {getDocumentIcon(document.documentType.name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-base truncate">
+                        {document.title}
+                      </h4>
+                      <p className="text-sm text-gray-500 capitalize truncate">
+                        {document.documentType.name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <div className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap shadow-sm",
+                      getStatusColor(document.status)
+                    )}>
+                      {document.status}
+                    </div>
+                  </div>
+                </div>
 
-      {/* Date Info */}
-      <div className="flex flex-wrap gap-4 text-xs text-gray-600 mb-4">
-        <div className="flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          {formatDate(document.createdAt)}
-        </div>
-        <div className="flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          {formatDate(document.updatedAt)}
-        </div>
-      </div>
+                {/* Date Info */}
+                <div className="flex flex-wrap gap-6 p-5 bg-gray-50 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 border border-blue-100">
+                      <Calendar className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Created</p>
+                      <p className="text-sm font-medium text-gray-700">{formatDate(document.createdAt)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-50 border border-purple-100">
+                      <Clock className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Updated</p>
+                      <p className="text-sm font-medium text-gray-700">{formatDate(document.updatedAt)}</p>
+                    </div>
+                  </div>
+                </div>
 
-      {/* Footer Actions */}
-      <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
-        <div className="flex flex-wrap gap-2">
-          <button className="p-2 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-colors">
-            <Eye className="h-4 w-4" />
-          </button>
-          <button className="p-2 rounded-lg hover:bg-green-100 hover:text-green-600 transition-colors">
-            <Edit3 className="h-4 w-4" />
-          </button>
-          <button className="p-2 rounded-lg hover:bg-purple-100 hover:text-purple-600 transition-colors">
-            <Share2 className="h-4 w-4" />
-          </button>
-          <button className="p-2 rounded-lg hover:bg-orange-100 hover:text-orange-600 transition-colors">
-            <Download className="h-4 w-4" />
-          </button>
-        </div>
-        <button className="p-2 rounded-lg hover:bg-red-100 hover:text-red-600 transition-colors">
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
-
+                {/* Footer Actions */}
+                <div className="flex items-center justify-between p-5">
+                  <div className="flex gap-3">
+                    <button className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-colors shadow-sm">
+                      <Eye className="h-5 w-5" />
+                    </button>
+                    <button className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-green-50 hover:border-green-200 hover:text-green-600 transition-colors shadow-sm">
+                      <Edit3 className="h-5 w-5" />
+                    </button>
+                    <button className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-600 transition-colors shadow-sm">
+                      <Share2 className="h-5 w-5" />
+                    </button>
+                    <button className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 transition-colors shadow-sm">
+                      <Download className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <button className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white hover:bg-red-50 hover:border-red-200 text-red-600 transition-colors shadow-sm">
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
