@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  FileText, 
+  FileText,
   Search,
   Download,
   Eye,
@@ -32,6 +32,7 @@ import {
   DialogTitle,
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
+import type { AxiosError } from "axios";
 
 interface DocumentType {
   id: string;
@@ -73,22 +74,22 @@ export default function UserDocument() {
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-  
+
   // Initialize the delete mutation
   const { mutate: deleteDocument, isPending: isDeleting } = useMutation({
     mutationFn: deleteUserDocument,
     onSuccess: () => {
       // Show success message
       toast.success("Document deleted successfully");
-      
+
       // Invalidate and refetch the documents after deletion
       queryClient.invalidateQueries({ queryKey: ["user-documents"] });
-      
+
       // Close the dialog
       setDeleteDialogOpen(false);
       setDocumentToDelete(null);
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<any>) => {
       const errorMessage =
         error.response?.data?.message || "Failed to delete document";
       toast.error(errorMessage);
@@ -98,7 +99,9 @@ export default function UserDocument() {
 
   // State for dialog control
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
+    null
+  );
 
   // Function to handle delete click
   const handleDeleteClick = (document: Document) => {
@@ -295,7 +298,11 @@ export default function UserDocument() {
           <div className="flex items-center gap-3">
             <select
               value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value as any)}
+              onChange={(e) =>
+                setSelectedFilter(
+                  e.target.value as "all" | "draft" | "completed" | "archived"
+                )
+              }
               className="px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50 shadow-sm"
             >
               {filterOptions.map((option) => (
@@ -307,7 +314,9 @@ export default function UserDocument() {
 
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) =>
+                setSortBy(e.target.value as "newest" | "oldest" | "name")
+              }
               className="px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50 shadow-sm"
             >
               <option value="newest">Newest First</option>
@@ -407,7 +416,7 @@ export default function UserDocument() {
                 </div>
 
                 {/* Date Info */}
-                <div className="flex flex-wrap gap-6 p-5 bg-gray-50 border-b border-gray-100">
+                <div className="flex flex-wrap gap-6 p-5  border-b border-gray-100">
                   <div className="flex items-center gap-2">
                     <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 border border-blue-100">
                       <Calendar className="h-4 w-4 text-blue-600" />
@@ -456,7 +465,11 @@ export default function UserDocument() {
                     }}
                     disabled={isDeleting}
                   >
-                    <Trash2 className={`h-5 w-5 ${isDeleting ? 'text-gray-400' : 'text-red-500'}`} />
+                    <Trash2
+                      className={`h-5 w-5 ${
+                        isDeleting ? "text-gray-400" : "text-red-500"
+                      }`}
+                    />
                   </button>
                 </div>
               </div>
@@ -467,30 +480,30 @@ export default function UserDocument() {
 
       {/* Shadcn Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white">
           <DialogHeader>
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
                 <AlertTriangle className="h-6 w-6 text-red-600" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-semibold text-gray-900">
-                  Delete Document
-                </DialogTitle>
+                <DialogTitle>Delete Document</DialogTitle>
+
                 <DialogDescription className="text-sm text-gray-600 mt-1">
                   This action cannot be undone.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
-          
+
           <div className="py-4">
             <p className="text-gray-700">
               Are you sure you want to delete{" "}
               <span className="font-medium text-gray-900">
                 "{documentToDelete?.title}"
               </span>
-              ? This will permanently remove the document and all its associated data.
+              ? This will permanently remove the document and all its associated
+              data.
             </p>
           </div>
 
@@ -499,7 +512,7 @@ export default function UserDocument() {
               variant="outline"
               onClick={cancelDelete}
               disabled={isDeleting}
-              className="flex-1"
+              className="flex-1 hover:cursor-pointer hover:bg-gray-200"
             >
               Cancel
             </Button>
@@ -507,7 +520,7 @@ export default function UserDocument() {
               variant="destructive"
               onClick={confirmDelete}
               disabled={isDeleting}
-              className="flex-1"
+              className="flex-1 bg-red-800 hover:cursor-pointer hover:bg-gray-100 hover:text-red-900"
             >
               {isDeleting ? (
                 <div className="flex items-center gap-2">
