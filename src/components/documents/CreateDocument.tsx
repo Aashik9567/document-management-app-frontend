@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  FileText, 
-  ChevronRight, 
+  Plus,
+  ArrowLeft,
   Loader2,
   AlertCircle,
-  Plus,
-  ArrowLeft
+  Sparkles
 } from "lucide-react";
 import { getDocumentTypes } from "../../endpoints/userDocument/getDocumentTypes";
 import {
@@ -21,7 +20,6 @@ import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import type { DocumentType } from "../../types/document";
 
-
 interface DocumentTypesResponse {
   success: boolean;
   data: DocumentType[];
@@ -30,7 +28,6 @@ interface DocumentTypesResponse {
 
 export default function CreateDocument() {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const {
     data: documentTypesResponse,
@@ -41,56 +38,57 @@ export default function CreateDocument() {
     queryKey: ["document-types"],
     queryFn: getDocumentTypes,
     retry: 2,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
   const documentTypes = documentTypesResponse?.data || [];
 
-  // Filter document types based on search term
-  const filteredDocumentTypes = documentTypes.filter((docType) =>
-    docType.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    docType.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Group document types by category
-  const groupedDocumentTypes = filteredDocumentTypes.reduce((acc, docType) => {
-    if (!acc[docType.category]) {
-      acc[docType.category] = [];
+  // Group document types by category for better organization
+  const groupedDocumentTypes = documentTypes.reduce((acc, docType) => {
+    const category = docType.category || "Other";
+    if (!acc[category]) {
+      acc[category] = [];
     }
-    acc[docType.category].push(docType);
+    acc[category].push(docType);
     return acc;
   }, {} as Record<string, DocumentType[]>);
 
-  const getDocumentIcon = (type: string, icon: string | null) => {
-    if (icon) return icon;
+  const categoryColors = {
+    "Legal": "from-red-500 to-pink-500",
+    "HR": "from-blue-500 to-cyan-500", 
+    "Business": "from-green-500 to-emerald-500",
+    "Employment": "from-purple-500 to-indigo-500",
+    "Other": "from-gray-500 to-slate-500"
+  };
+
+  const getCategoryColor = (category: string) => {
+    return categoryColors[category as keyof typeof categoryColors] || categoryColors["Other"];
+  };
+
+  const getDocumentIcon = (type: string) => {
+    const normalizedType = type.toLowerCase();
     
-    switch (type.toLowerCase()) {
-      case "nda":
-      case "non-disclosure agreement":
-        return "🔒";
-      case "contract":
-        return "📋";
-      case "agreement":
-        return "🤝";
-      case "letter":
-        return "✉️";
-      case "invoice":
-        return "💰";
-      case "proposal":
-        return "📊";
-      case "report":
-        return "📈";
-      case "memo":
-        return "📝";
-      default:
-        return "📄";
+    if (normalizedType.includes("nda") || normalizedType.includes("non-disclosure")) {
+      return "🔐";
+    } else if (normalizedType.includes("offer letter") || normalizedType.includes("offer")) {
+      return "💼";
+    } else if (normalizedType.includes("resignation") || normalizedType.includes("regination")) {
+      return "📤";
+    } else if (normalizedType.includes("service agreement") || normalizedType.includes("service")) {
+      return "🤝";
+    } else if (normalizedType.includes("experience certificate") || normalizedType.includes("experience")) {
+      return "🎓";
+    } else if (normalizedType.includes("recommendation") || normalizedType.includes("reference")) {
+      return "⭐";
+    } else {
+      return "📄";
     }
   };
 
   const handleDocumentTypeSelect = (documentType: DocumentType) => {
     setSelectedDocumentId(documentType.id);
-    // Here you can add logic to proceed to the next step
-    console.log("Selected document type:", documentType);
+    console.log(`Selected Document Type: ${documentType.name}`);
+    console.log(`Document Type ID: ${documentType.id}`);
   };
 
   const handleBackToSelection = () => {
@@ -100,18 +98,14 @@ export default function CreateDocument() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8">
-            <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900">Loading Document Types</h3>
-                <p className="text-sm text-gray-600 mt-1">Please wait while we fetch available templates...</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-lg mb-4">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Loading Templates</h3>
+          <p className="text-gray-600">Fetching available document types...</p>
+        </div>
       </div>
     );
   }
@@ -119,96 +113,94 @@ export default function CreateDocument() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-red-100">
-                <AlertCircle className="h-8 w-8 text-red-600" />
-              </div>
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900">Error Loading Document Types</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  {error instanceof Error ? error.message : "Something went wrong"}
-                </p>
-              </div>
-              <Button onClick={() => refetch()} className="w-full">
-                Try Again
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+            <AlertCircle className="h-8 w-8 text-red-600" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h3>
+          <p className="text-gray-600 mb-6">Unable to load document templates</p>
+          <Button onClick={() => refetch()} className="bg-red-600 hover:bg-red-700">
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
 
-  // If no document type is selected, show selection interface
+  // Document type selection view
   if (!selectedDocumentId) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-purple-200">
+        <div className="max-w-6xl mx-auto px-4 py-12">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mx-auto mb-4">
-              <Plus className="h-8 w-8 text-blue-600" />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg mb-6">
+              <Plus className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Create New Document</h1>
-            <p className="text-lg text-gray-600 mt-2">
-              Choose a document type to get started with your template
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Create New Document</h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Choose from our collection of professional templates to get started
             </p>
           </div>
 
           {/* Document Types Grid */}
-          {filteredDocumentTypes.length === 0 ? (
-            <Card className="max-w-2xl mx-auto">
-              <CardContent className="p-12 text-center">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mx-auto mb-4">
-                  <FileText className="h-8 w-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Document Types Found</h3>
-                <p className="text-gray-600">
-                  {searchTerm ? "Try adjusting your search criteria" : "No document types are available at the moment"}
-                </p>
-              </CardContent>
-            </Card>
+          {documentTypes.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gray-100 mb-6">
+                <Plus className="h-10 w-10 text-gray-400" />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-3">No templates available</h3>
+              <p className="text-gray-600 text-lg">
+                No document templates are currently available
+              </p>
+            </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-12">
               {Object.entries(groupedDocumentTypes).map(([category, types]) => (
-                <div key={category} className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Badge variant="secondary" className="text-sm">
-                      {types.length} {types.length === 1 ? 'template' : 'templates'}
-                    </Badge>
+                <div key={category} className="space-y-6">
+                  {/* Category Header */}
+                  <div className="flex items-center gap-4">
+                    <div className={`h-1 flex-1 rounded-full bg-gradient-to-r ${getCategoryColor(category)}`}></div>
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-2xl font-bold text-gray-900">{category}</h2>
+                      <Badge 
+                        variant="secondary" 
+                        className="text-sm font-semibold bg-gray-100 text-gray-700"
+                      >
+                        {types.length} template{types.length !== 1 ? 's' : ''}
+                      </Badge>
+                    </div>
+                    <div className={`h-1 flex-1 rounded-full bg-gradient-to-r ${getCategoryColor(category)}`}></div>
                   </div>
-                  
+
+                  {/* Document Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {types.map((docType) => (
                       <Card
                         key={docType.id}
-                        className="group cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-blue-300"
+                        className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-0 shadow-lg hover:scale-105 bg-white/90 backdrop-blur-sm overflow-hidden"
                         onClick={() => handleDocumentTypeSelect(docType)}
                       >
-                        <CardHeader className="pb-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-50 text-2xl group-hover:bg-blue-100 transition-colors">
-                                {getDocumentIcon(docType.name, docType.icon)}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                                  {docType.name}
-                                </CardTitle>
-                                <Badge 
-                                  variant="outline" 
-                                  className="text-xs mt-1 capitalize"
-                                >
-                                  {docType.category}
-                                </Badge>
-                              </div>
+                        <div className={`h-2 bg-gradient-to-r ${getCategoryColor(docType.category || "Other")}`}></div>
+                        <CardContent className="p-6">
+                          <div className="flex flex-col items-center text-center space-y-4">
+                            <div className={`flex items-center justify-center w-18 h-18 rounded-2xl bg-gradient-to-r ${getCategoryColor(docType.category || "Other")} text-4xl group-hover:shadow-lg transition-all duration-300 shadow-md`}>
+                              {getDocumentIcon(docType.name)}
                             </div>
-                            <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                            <div className="space-y-2">
+                              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+                                {docType.name}
+                              </h3>
+                              <Badge 
+                                variant="outline" 
+                                className="text-xs bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors"
+                              >
+                                {docType.category}
+                              </Badge>
+                            </div>
                           </div>
-                        </CardHeader>
+                        </CardContent>
                       </Card>
                     ))}
                   </div>
@@ -221,80 +213,88 @@ export default function CreateDocument() {
     );
   }
 
-  // If a document type is selected, show the selected state (you can expand this)
+  // Document creation form
   const selectedDocumentType = documentTypes.find(dt => dt.id === selectedDocumentId);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with back button */}
-        <div className="flex items-center gap-4 mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        {/* Header */}
+        <div className="flex items-center gap-6 mb-8">
           <Button
             variant="outline"
-            size="sm"
+            size="lg"
             onClick={handleBackToSelection}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-2 hover:bg-gray-50"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Selection
+            <ArrowLeft className="h-5 w-5" />
+            Back
           </Button>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-50 text-2xl">
-              {getDocumentIcon(selectedDocumentType?.name || '', selectedDocumentType?.icon || null)}
-            </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4">
+              <div className={`flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${getCategoryColor(selectedDocumentType?.category || "Other")} text-3xl shadow-lg`}>
+                {getDocumentIcon(selectedDocumentType?.name || '')}
+              </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Create {selectedDocumentType?.name}
               </h1>
-              <p className="text-gray-600">
-                Selected document type: {selectedDocumentType?.name}
+              <p className="text-gray-600 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-yellow-500" />
+                Professional template ready to customize
               </p>
             </div>
           </div>
         </div>
 
-        {/* Document creation form would go here */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Document Details</CardTitle>
-            <CardDescription>
+        {/* Creation Form */}
+        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <CardHeader className="pb-6">
+            <CardTitle className="text-2xl">Document Details</CardTitle>
+            <CardDescription className="text-lg">
               Fill in the details for your new {selectedDocumentType?.name}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Document Title
-                </label>
-                <Input
-                  placeholder={`Enter ${selectedDocumentType?.name} title`}
-                  className="w-full"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description (Optional)
-                </label>
-                <Input
-                  placeholder="Brief description of the document"
-                  className="w-full"
-                />
-              </div>
+          <CardContent className="space-y-8">
+            <div className="space-y-4">
+              <label className="block text-sm font-semibold text-gray-700">
+                Document Title
+              </label>
+              <Input
+                placeholder={`Enter ${selectedDocumentType?.name} title`}
+                className="h-12 text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+              />
+            </div>
+            
+            <div className="space-y-4">
+              <label className="block text-sm font-semibold text-gray-700">
+                Description (Optional)
+              </label>
+              <Input
+                placeholder="Brief description of the document"
+                className="h-12 text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+              />
+            </div>
 
-              <div className="flex gap-4 pt-4">
-                <Button className="flex-1">
-                  Create Document
-                </Button>
-                <Button variant="outline" className="flex-1">
-                  Save as Draft
-                </Button>
-              </div>
+            <div className="flex gap-4 pt-6">
+              <Button 
+                size="lg" 
+                className="flex-1 h-12 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Create Document
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="flex-1 h-12 text-lg border-2 hover:bg-gray-50"
+              >
+                Save as Draft
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
+    </div>
     </div>
   );
 }
