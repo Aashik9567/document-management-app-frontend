@@ -1,4 +1,4 @@
-import { FileText, Notebook, Users, Upload, Zap, ArrowRight, Sparkles } from 'lucide-react';
+import { FileText, Notebook, Users, Upload, ArrowRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 
@@ -13,7 +13,6 @@ export default function QuickActions() {
       gradient: 'from-indigo-500 via-purple-500 to-pink-500',
       bgColor: 'bg-indigo-600',
       onClick: () => navigate('/dashboard/create/nda'),
-      popular: true
     },
     {
       name: 'Employment Contract',
@@ -22,7 +21,6 @@ export default function QuickActions() {
       gradient: 'from-emerald-500 via-teal-500 to-cyan-500',
       bgColor: 'bg-emerald-600',
       onClick: () => navigate('/dashboard/create/contract'),
-      popular: false
     },
     {
       name: 'Use Template',
@@ -31,7 +29,6 @@ export default function QuickActions() {
       gradient: 'from-violet-500 via-purple-500 to-fuchsia-500',
       bgColor: 'bg-violet-600',
       onClick: () => navigate('/dashboard/templates'),
-      popular: true
     },
     {
       name: 'Upload Document',
@@ -39,8 +36,7 @@ export default function QuickActions() {
       icon: Upload,
       gradient: 'from-orange-500 via-amber-500 to-yellow-500',
       bgColor: 'bg-orange-600',
-      onClick: () => navigate('/dashboard/upload'),
-      popular: false
+      onClick: () => navigate('/dashboard/upload')
     }
   ];
 
@@ -75,12 +71,6 @@ export default function QuickActions() {
             onClick={action.onClick}
             className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 hover:shadow-md transition-all"
           >
-            {action.popular && (
-              <div className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500 text-xs font-bold text-white shadow-sm">
-                <Zap className="h-3 w-3" />
-                Popular
-              </div>
-            )}
             
             <div className="p-5 flex items-start gap-5">
               <div className={cn(
