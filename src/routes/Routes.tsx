@@ -8,6 +8,7 @@ import HowItWorksSection from "../components/home/HowItWorksSection";
 import ContactSection from "../components/home/ContactSection";
 import DashboardSetting from "../components/dashboard/DashboardSetting";
 import Layout from "../pages/DashboardPages/Layout";
+import Document from "../pages/DocumentPages/Document";
 
 const PageRoutes = () => {
   return (
@@ -31,6 +32,7 @@ const PageRoutes = () => {
             <Route index element={<Dashboard />} />
             <Route path="settings" element={<DashboardSetting />} />
           </Route>
+          <Route path="/document/create" element={<Document/>}/>
           {/* Add more routes as needed */}
         </Routes>
       </BrowserRouter>

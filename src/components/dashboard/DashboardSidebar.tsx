@@ -125,7 +125,7 @@ export default function DashboardSidebar() {
       {/* Create Button */}
       <div className="p-4">
         <button
-          onClick={() => navigate('/dashboard/create')}
+          onClick={() => navigate('/document/create')}
           className={cn(
             "w-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all flex items-center rounded-lg shadow-sm",
             isCollapsed ? "p-3 justify-center" : "px-4 py-3 space-x-2"

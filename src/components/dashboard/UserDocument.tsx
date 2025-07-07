@@ -32,7 +32,7 @@ import {
   DialogTitle,
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
-
+import { useNavigate } from "react-router-dom";
 interface DocumentType {
   id: string;
   name: string;
@@ -52,6 +52,7 @@ interface Document {
 }
 
 export default function UserDocument() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<
     "all" | "draft" | "completed" | "archived"
@@ -273,7 +274,7 @@ export default function UserDocument() {
               </p>
             </div>
           </div>
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-all shadow-sm">
+          <button onClick={() => navigate('/document/create')} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-all shadow-sm">
             <Plus className="h-4 w-4" />
             New Document
           </button>
