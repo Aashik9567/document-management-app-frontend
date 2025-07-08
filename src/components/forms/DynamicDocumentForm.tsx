@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
@@ -57,16 +57,10 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
   const [isFormExpanded, setIsFormExpanded] = useState(true);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [aiGeneratingField, setAiGeneratingField] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime] = useState(new Date()); // Remove setInterval to prevent updates
 
-  // Update time every minute for preview
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Generate dynamic Zod schema
-  const schema = generateDynamicSchema(fields);
+  // Memoize the schema to prevent regeneration on each render
+  const schema = useMemo(() => generateDynamicSchema(fields), [fields]);
   
   const {
     register,
@@ -79,20 +73,27 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     mode: 'onChange'
   });
 
-  // Watch all form values for live preview
+  // Memoize sorted fields to prevent recalculation
+  const sortedFields = useMemo(() => 
+    [...fields].sort((a, b) => a.sortOrder - b.sortOrder), 
+    [fields]
+  );
+
+  // Watch all form values for live preview - use useCallback to prevent infinite loops
   const watchedValues = watch();
   
   useEffect(() => {
-    setFormData(watchedValues);
+    // Only update if values actually changed
+    const newData = { ...watchedValues };
+    setFormData(prevData => {
+      const hasChanged = JSON.stringify(prevData) !== JSON.stringify(newData);
+      return hasChanged ? newData : prevData;
+    });
   }, [watchedValues]);
 
-  // Sort fields by sortOrder
-  const sortedFields = [...fields].sort((a, b) => a.sortOrder - b.sortOrder);
-
-  // Fields that should have AI generation button
-  const fieldsWithAI = ['textarea', 'text', 'email', 'select'];
-  
-  const shouldShowAIButton = (fieldType: string, fieldName: string) => {
+  // Memoize field type checking function
+  const shouldShowAIButton = useCallback((fieldType: string, fieldName: string) => {
+    const fieldsWithAI = ['textarea', 'text', 'email', 'select'];
     return fieldsWithAI.includes(fieldType) && 
            (fieldType === 'textarea' || 
             fieldName.toLowerCase().includes('description') ||
@@ -102,9 +103,9 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             fieldName.toLowerCase().includes('address') ||
             fieldName.toLowerCase().includes('company') ||
             fieldName.toLowerCase().includes('position'));
-  };
+  }, []);
 
-  const getFieldIcon = (fieldType: string, fieldName: string) => {
+  const getFieldIcon = useCallback((fieldType: string, fieldName: string) => {
     const iconProps = { className: "h-4 w-4 text-indigo-600" };
     
     if (fieldName.toLowerCase().includes('company')) return <Building {...iconProps} />;
@@ -127,9 +128,11 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       default:
         return <User {...iconProps} />;
     }
-  };
+  }, []);
 
-  const handleAIGenerate = async (fieldName: string, fieldType: string) => {
+  const handleAIGenerate = useCallback(async (fieldName: string, fieldType: string) => {
+    if (aiGeneratingField) return; // Prevent multiple simultaneous generations
+    
     setAiGeneratingField(fieldName);
     
     try {
@@ -188,9 +191,9 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     } finally {
       setAiGeneratingField(null);
     }
-  };
+  }, [aiGeneratingField, setValue]);
 
-  const onFormSubmit = (data: any) => {
+  const onFormSubmit = useCallback((data: any) => {
     const submitData = {
       ...data,
       documentType: documentTypeName,
@@ -198,9 +201,9 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       isDraft: false
     };
     onSubmit(submitData);
-  };
+  }, [documentTypeName, onSubmit]);
 
-  const onSaveDraftClick = () => {
+  const onSaveDraftClick = useCallback(() => {
     const draftData = {
       ...formData,
       documentType: documentTypeName,
@@ -208,9 +211,14 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       isDraft: true
     };
     onSaveDraft(draftData);
-  };
+  }, [formData, documentTypeName, onSaveDraft]);
 
-  const renderField = (field: DocumentField) => {
+  // Memoize the select change handler to prevent recreation
+  const handleSelectChange = useCallback((fieldName: string) => (value: string) => {
+    setValue(fieldName, value);
+  }, [setValue]);
+
+  const renderField = useCallback((field: DocumentField) => {
     const error = errors[field.fieldName];
     const hasError = !!error;
     const isAIGenerating = aiGeneratingField === field.fieldName;
@@ -229,6 +237,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     // AI Button Component - Fixed positioning and z-index
     const aiButton = showAI && (
       <Button
+        key={`ai-${field.fieldName}`} // Add key to prevent React issues
         type="button"
         onClick={() => handleAIGenerate(field.fieldName, field.fieldType)}
         disabled={isAIGenerating}
@@ -246,7 +255,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     switch (field.fieldType) {
       case 'textarea':
         return (
-          <div className="relative">
+          <div className="relative" key={`textarea-${field.fieldName}`}>
             <Textarea
               {...register(field.fieldName)}
               placeholder={field.placeholder}
@@ -260,9 +269,9 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       case 'select':
         const options = field.options ? JSON.parse(field.options) : [];
         return (
-          <div className="relative">
+          <div className="relative" key={`select-${field.fieldName}`}>
             <Select
-              onValueChange={(value) => setValue(field.fieldName, value)}
+              onValueChange={handleSelectChange(field.fieldName)}
             >
               <SelectTrigger className={`${baseInputClasses} h-12 ${showAI ? 'pr-14' : 'pr-4'} pl-4`}>
                 <SelectValue placeholder={field.placeholder} />
@@ -270,7 +279,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
               <SelectContent className="border-2 border-gray-200 rounded-xl shadow-xl bg-white/95 backdrop-blur-sm z-50">
                 {options.map((option: string, index: number) => (
                   <SelectItem 
-                    key={index} 
+                    key={`${field.fieldName}-option-${index}`}
                     value={option} 
                     className="rounded-lg hover:bg-indigo-50 focus:bg-indigo-50 cursor-pointer"
                   >
@@ -281,6 +290,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             </Select>
             {showAI && (
               <Button
+                key={`ai-select-${field.fieldName}`}
                 type="button"
                 onClick={() => handleAIGenerate(field.fieldName, field.fieldType)}
                 disabled={isAIGenerating}
@@ -300,6 +310,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       case 'date':
         return (
           <Input
+            key={`date-${field.fieldName}`}
             type="date"
             {...register(field.fieldName)}
             className={`${baseInputClasses} h-12 pr-4 pl-4`}
@@ -309,6 +320,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       case 'number':
         return (
           <Input
+            key={`number-${field.fieldName}`}
             type="number"
             {...register(field.fieldName)}
             placeholder={field.placeholder}
@@ -320,7 +332,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
         
       default:
         return (
-          <div className="relative">
+          <div className="relative" key={`input-${field.fieldName}`}>
             <Input
               type={field.fieldType === 'email' ? 'email' : field.fieldType === 'phone' ? 'tel' : 'text'}
               {...register(field.fieldName)}
@@ -329,6 +341,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             />
             {showAI && (
               <Button
+                key={`ai-input-${field.fieldName}`}
                 type="button"
                 onClick={() => handleAIGenerate(field.fieldName, field.fieldType)}
                 disabled={isAIGenerating}
@@ -345,15 +358,15 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
           </div>
         );
     }
-  };
+  }, [errors, aiGeneratingField, shouldShowAIButton, register, handleAIGenerate, handleSelectChange]);
 
-  const renderPreviewField = (fieldName: string, value: any, label: string, fieldType: string) => {
+  const renderPreviewField = useCallback((fieldName: string, value: any, label: string, fieldType: string) => {
     if (!value || (typeof value === 'string' && !value.trim())) return null;
     
     const isLongText = fieldType === 'textarea' || (typeof value === 'string' && value.length > 50);
     
     return (
-      <div className="mb-6 p-5 rounded-xl bg-gradient-to-r from-gray-50 via-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+      <div key={`preview-${fieldName}`} className="mb-6 p-5 rounded-xl bg-gradient-to-r from-gray-50 via-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
         <div className="text-xs font-bold text-indigo-700 mb-3 uppercase tracking-wider flex items-center gap-2">
           <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
           {label}
@@ -368,7 +381,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
         </div>
       </div>
     );
-  };
+  }, []);
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -397,7 +410,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       {/* Form Panel */}
       <div 
         className={`transition-all duration-500 ease-in-out bg-white/95 backdrop-blur-sm border-r border-gray-200 shadow-xl overflow-hidden ${
-          isFormExpanded ? 'w-2/4' : 'w-0'
+          isFormExpanded ? 'w-2/5' : 'w-0'
         }`}
       >
         {isFormExpanded && (
@@ -533,84 +546,86 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       </div>
 
       {/* Enhanced A4 Preview Panel */}
-      <div className="flex-1 bg-gradient-to-br from-gray-100 to-gray-200 p-6">
-        <div className="max-w-4xl mx-auto h-full">
-          <div className="mb-6 flex items-center justify-between">
+      <div className="flex-1 bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+        <div className="h-full flex flex-col">
+          <div className="mb-4 flex items-center justify-between px-2">
             <div>
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <Eye className="h-5 w-5 text-indigo-600" />
                 Live Document Preview
               </h3>
-              <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
+              <p className="text-xs text-gray-600 flex items-center gap-2 mt-1">
                 <Clock className="h-4 w-4" />
                 Updates in real-time as you type
               </p>
             </div>
-            <Badge variant="outline" className="bg-white/80 backdrop-blur-sm border-indigo-200 text-indigo-700 px-3 py-1">
+            <Badge variant="outline" className="bg-white/80 backdrop-blur-sm border-indigo-200 text-indigo-700 px-3 py-1 text-xs">
               A4 Format
             </Badge>
           </div>
           
-          {/* Enhanced A4 Paper */}
-          <div 
-            className="bg-white shadow-2xl rounded-xl overflow-hidden border border-gray-200" 
-            style={{ aspectRatio: '210/297', height: 'calc(100vh - 200px)' }}
-          >
-            <div className="h-full p-12 overflow-y-auto">
-              {/* Enhanced Document Header */}
-              <div className="text-center mb-10 pb-6 border-b-2 border-gray-100">
-                <h1 className="text-3xl font-bold text-gray-900 mb-3">
-                  {documentTypeName}
-                </h1>
-                <div className="w-32 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mx-auto rounded-full mb-3"></div>
-                <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Generated on {currentTime.toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </p>
-              </div>
+          {/* Enlarged A4 Paper - Full Height */}
+          <div className="flex-1 flex items-center justify-center">
+            <div 
+              className="bg-white shadow-2xl rounded-xl overflow-hidden border border-gray-200 w-full max-w-5xl" 
+              style={{ height: 'calc(100vh - 140px)', aspectRatio: '210/297' }}
+            >
+              <div className="h-full p-8 overflow-y-auto">
+                {/* Enhanced Document Header */}
+                <div className="text-center mb-8 pb-6 border-b-2 border-gray-100">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                    {documentTypeName}
+                  </h1>
+                  <div className="w-40 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mx-auto rounded-full mb-4"></div>
+                  <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Generated on {currentTime.toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                </div>
 
-              {/* Enhanced Document Content */}
-              <div className="space-y-6">
-                {sortedFields.map((field) => 
-                  renderPreviewField(
-                    field.fieldName, 
-                    formData[field.fieldName], 
-                    field.label,
-                    field.fieldType
-                  )
-                )}
-                
-                {Object.keys(formData).filter(key => formData[key] && String(formData[key]).trim()).length === 0 && (
-                  <div className="text-center py-20">
-                    <div className="w-20 h-20 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <FileText className="h-10 w-10 text-indigo-500" />
+                {/* Enhanced Document Content */}
+                <div className="space-y-8">
+                  {sortedFields.map((field) => 
+                    renderPreviewField(
+                      field.fieldName, 
+                      formData[field.fieldName], 
+                      field.label,
+                      field.fieldType
+                    )
+                  )}
+                  
+                  {Object.keys(formData).filter(key => formData[key] && String(formData[key]).trim()).length === 0 && (
+                    <div className="text-center py-24">
+                      <div className="w-24 h-24 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                        <FileText className="h-12 w-12 text-indigo-500" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-700 mb-3">
+                        Your Document Preview
+                      </h3>
+                      <p className="text-gray-500 max-w-lg mx-auto text-base leading-relaxed">
+                        Start filling out the form on the left to see your document come to life in real-time
+                      </p>
+                      <div className="mt-8 flex items-center justify-center gap-2 text-base text-indigo-600">
+                        <Sparkles className="h-5 w-5" />
+                        Use AI assistance for faster completion
+                      </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                      Your Document Preview
-                    </h3>
-                    <p className="text-gray-500 max-w-md mx-auto">
-                      Start filling out the form on the left to see your document come to life in real-time
-                    </p>
-                    <div className="mt-6 flex items-center justify-center gap-2 text-sm text-indigo-600">
-                      <Sparkles className="h-4 w-4" />
-                      Use AI assistance for faster completion
+                  )}
+                  
+                  {/* Document Footer */}
+                  {Object.keys(formData).filter(key => formData[key] && String(formData[key]).trim()).length > 0 && (
+                    <div className="mt-16 pt-8 border-t border-gray-200 text-center">
+                      <p className="text-xs text-gray-400">
+                        Document generated on {currentTime.toLocaleString()}
+                      </p>
                     </div>
-                  </div>
-                )}
-                
-                {/* Document Footer */}
-                {Object.keys(formData).filter(key => formData[key] && String(formData[key]).trim()).length > 0 && (
-                  <div className="mt-12 pt-8 border-t border-gray-200 text-center">
-                    <p className="text-xs text-gray-400">
-                      Document generated on {currentTime.toLocaleString()}
-                    </p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
