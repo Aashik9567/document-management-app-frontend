@@ -416,7 +416,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
         {isFormExpanded && (
           <div className="h-full flex flex-col">
             {/* Enhanced Form Header */}
-            <div className="px-8 py-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden">
+            <div className="px-8 py-6 bg-indigo-600 relative overflow-hidden">
               <div className="absolute inset-0 bg-black/10"></div>
               <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
               <div className="relative z-10">
