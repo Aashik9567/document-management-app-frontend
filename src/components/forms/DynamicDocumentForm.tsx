@@ -2,25 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
-  Calendar,
-  Phone,
-  Mail,
-  User,
-  FileText,
-  PenTool,
-  Hash,
-  X,
-  Menu,
-  Save,
-  Send,
-  Eye,
-  Sparkles,
-  Bot,
-  ChevronRight,
-  Clock,
-  MapPin,
-  Building,
-  Briefcase
+  Calendar, Phone, Mail, User, FileText, PenTool, Hash, X, Menu, Save, Send, Eye, Sparkles, Bot, ChevronRight, Clock, MapPin, Building, Briefcase
 } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
@@ -46,7 +28,7 @@ interface DynamicDocumentFormProps {
   isLoading?: boolean;
 }
 
-export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
+const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
   fields,
   documentTypeName,
   onSubmit,
@@ -57,9 +39,8 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
   const [isFormExpanded, setIsFormExpanded] = useState(true);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [aiGeneratingField, setAiGeneratingField] = useState<string | null>(null);
-  const [currentTime] = useState(new Date()); // Remove setInterval to prevent updates
+  const [currentTime] = useState(new Date());
 
-  // Memoize the schema to prevent regeneration on each render
   const schema = useMemo(() => generateDynamicSchema(fields), [fields]);
   
   const {
@@ -73,17 +54,14 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     mode: 'onChange'
   });
 
-  // Memoize sorted fields to prevent recalculation
   const sortedFields = useMemo(() => 
     [...fields].sort((a, b) => a.sortOrder - b.sortOrder), 
     [fields]
   );
 
-  // Watch all form values for live preview - use useCallback to prevent infinite loops
   const watchedValues = watch();
   
   useEffect(() => {
-    // Only update if values actually changed
     const newData = { ...watchedValues };
     setFormData(prevData => {
       const hasChanged = JSON.stringify(prevData) !== JSON.stringify(newData);
@@ -91,7 +69,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     });
   }, [watchedValues]);
 
-  // Memoize field type checking function
   const shouldShowAIButton = useCallback((fieldType: string, fieldName: string) => {
     const fieldsWithAI = ['textarea', 'text', 'email', 'select'];
     return fieldsWithAI.includes(fieldType) && 
@@ -107,39 +84,25 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
 
   const getFieldIcon = useCallback((fieldType: string, fieldName: string) => {
     const iconProps = { className: "h-4 w-4 text-indigo-600" };
-    
     if (fieldName.toLowerCase().includes('company')) return <Building {...iconProps} />;
     if (fieldName.toLowerCase().includes('position') || fieldName.toLowerCase().includes('job')) return <Briefcase {...iconProps} />;
     if (fieldName.toLowerCase().includes('address')) return <MapPin {...iconProps} />;
-    
     switch (fieldType) {
-      case 'email':
-        return <Mail {...iconProps} />;
-      case 'phone':
-        return <Phone {...iconProps} />;
-      case 'date':
-        return <Calendar {...iconProps} />;
-      case 'textarea':
-        return <FileText {...iconProps} />;
-      case 'signature':
-        return <PenTool {...iconProps} />;
-      case 'number':
-        return <Hash {...iconProps} />;
-      default:
-        return <User {...iconProps} />;
+      case 'email': return <Mail {...iconProps} />;
+      case 'phone': return <Phone {...iconProps} />;
+      case 'date': return <Calendar {...iconProps} />;
+      case 'textarea': return <FileText {...iconProps} />;
+      case 'signature': return <PenTool {...iconProps} />;
+      case 'number': return <Hash {...iconProps} />;
+      default: return <User {...iconProps} />;
     }
   }, []);
 
   const handleAIGenerate = useCallback(async (fieldName: string, fieldType: string) => {
-    if (aiGeneratingField) return; // Prevent multiple simultaneous generations
-    
+    if (aiGeneratingField) return;
     setAiGeneratingField(fieldName);
-    
     try {
-      // Simulate AI generation delay
       await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
-      
-      // Enhanced AI generated content based on field context
       const mockGeneratedContent: Record<string, string> = {
         'fullName': 'Alexander James Rodriguez',
         'firstName': 'Alexander',
@@ -161,12 +124,8 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
         'education': 'Master of Science in Computer Science, Stanford University',
         'qualifications': 'Certified Solutions Architect, PMP Certified, Agile Scrum Master'
       };
-
-      // Try to find the best match for the field
       let generatedValue = mockGeneratedContent[fieldName];
-      
       if (!generatedValue) {
-        // Generate based on field name patterns
         const lowerFieldName = fieldName.toLowerCase();
         if (lowerFieldName.includes('description') || lowerFieldName.includes('summary')) {
           generatedValue = mockGeneratedContent.description;
@@ -184,10 +143,9 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
           generatedValue = `AI-generated content for ${fieldName.replace(/([A-Z])/g, ' $1').toLowerCase()}`;
         }
       }
-      
       setValue(fieldName, generatedValue);
     } catch (error) {
-      console.error('AI generation failed:', error);
+      // AI generation failed
     } finally {
       setAiGeneratingField(null);
     }
@@ -213,7 +171,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     onSaveDraft(draftData);
   }, [formData, documentTypeName, onSaveDraft]);
 
-  // Memoize the select change handler to prevent recreation
   const handleSelectChange = useCallback((fieldName: string) => (value: string) => {
     setValue(fieldName, value);
   }, [setValue]);
@@ -223,21 +180,16 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
     const hasError = !!error;
     const isAIGenerating = aiGeneratingField === field.fieldName;
     const showAI = shouldShowAIButton(field.fieldType, field.fieldName);
-    
     const baseInputClasses = `
       text-sm border-2 border-gray-200 rounded-xl transition-all duration-300 bg-white/90 backdrop-blur-sm
       focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 focus:outline-none focus:bg-white
       hover:border-indigo-300 hover:bg-white hover:shadow-sm
-      ${hasError 
-        ? 'border-red-300 focus:border-red-400 focus:ring-red-100 bg-red-50/30' 
-        : ''
-      }
+      ${hasError ? 'border-red-300 focus:border-red-400 focus:ring-red-100 bg-red-50/30' : ''}
     `;
 
-    // AI Button Component - Fixed positioning and z-index
     const aiButton = showAI && (
       <Button
-        key={`ai-${field.fieldName}`} // Add key to prevent React issues
+        key={`ai-${field.fieldName}`}
         type="button"
         onClick={() => handleAIGenerate(field.fieldName, field.fieldType)}
         disabled={isAIGenerating}
@@ -265,7 +217,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             {aiButton}
           </div>
         );
-        
       case 'select':
         const options = field.options ? JSON.parse(field.options) : [];
         return (
@@ -306,7 +257,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             )}
           </div>
         );
-        
       case 'date':
         return (
           <Input
@@ -316,7 +266,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             className={`${baseInputClasses} h-12 pr-4 pl-4`}
           />
         );
-        
       case 'number':
         return (
           <Input
@@ -329,7 +278,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             max={field.maxLength || undefined}
           />
         );
-        
       default:
         return (
           <div className="relative" key={`input-${field.fieldName}`}>
@@ -362,9 +310,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
 
   const renderPreviewField = useCallback((fieldName: string, value: any, label: string, fieldType: string) => {
     if (!value || (typeof value === 'string' && !value.trim())) return null;
-    
     const isLongText = fieldType === 'textarea' || (typeof value === 'string' && value.length > 50);
-    
     return (
       <div key={`preview-${fieldName}`} className="mb-6 p-5 rounded-xl bg-gradient-to-r from-gray-50 via-white to-gray-50 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
         <div className="text-xs font-bold text-indigo-700 mb-3 uppercase tracking-wider flex items-center gap-2">
@@ -385,7 +331,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* Sidebar - Shows when form is collapsed */}
+      {/* Sidebar */}
       {!isFormExpanded && (
         <div className="w-20 bg-white/90 backdrop-blur-sm border-r border-gray-200 flex flex-col items-center py-8 shadow-xl">
           <Button
@@ -415,7 +361,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
       >
         {isFormExpanded && (
           <div className="h-full flex flex-col">
-            {/* Enhanced Form Header */}
+            {/* Form Header */}
             <div className="px-8 py-6 bg-indigo-600 relative overflow-hidden">
               <div className="absolute inset-0 bg-black/10"></div>
               <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
@@ -480,11 +426,9 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
                         )}
                       </div>
                     </div>
-                    
                     <div className="pl-4">
                       {renderField(field)}
                     </div>
-                    
                     {errors[field.fieldName] && (
                       <div className="pl-4 flex items-center gap-3 p-4 bg-red-50 rounded-xl border border-red-200">
                         <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
@@ -498,7 +442,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
               </form>
             </div>
 
-            {/* Enhanced Form Actions */}
+            {/* Form Actions */}
             <div className="px-8 py-6 border-t border-gray-200 bg-gray-50/50 backdrop-blur-sm">
               <div className="flex gap-3">
                 <Button 
@@ -531,7 +475,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
                   Save Draft
                 </Button>
               </div>
-              
               <Button 
                 type="button"
                 onClick={onCancel}
@@ -545,7 +488,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
         )}
       </div>
 
-      {/* Enhanced A4 Preview Panel */}
+      {/* Preview Panel */}
       <div className="flex-1 bg-gradient-to-br from-gray-100 to-gray-200 p-4">
         <div className="h-full flex flex-col">
           <div className="mb-4 flex items-center justify-between px-2">
@@ -563,15 +506,12 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
               A4 Format
             </Badge>
           </div>
-          
-          {/* Enlarged A4 Paper - Full Height */}
           <div className="flex-1 flex items-center justify-center">
             <div 
               className="bg-white shadow-2xl rounded-xl overflow-hidden border border-gray-200 w-full max-w-5xl" 
               style={{ height: 'calc(100vh - 140px)', aspectRatio: '210/297' }}
             >
               <div className="h-full p-8 overflow-y-auto">
-                {/* Enhanced Document Header */}
                 <div className="text-center mb-8 pb-6 border-b-2 border-gray-100">
                   <h1 className="text-4xl font-bold text-gray-900 mb-4">
                     {documentTypeName}
@@ -587,8 +527,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
                     })}
                   </p>
                 </div>
-
-                {/* Enhanced Document Content */}
                 <div className="space-y-8">
                   {sortedFields.map((field) => 
                     renderPreviewField(
@@ -598,7 +536,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
                       field.fieldType
                     )
                   )}
-                  
                   {Object.keys(formData).filter(key => formData[key] && String(formData[key]).trim()).length === 0 && (
                     <div className="text-center py-24">
                       <div className="w-24 h-24 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-8">
@@ -616,8 +553,6 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
                       </div>
                     </div>
                   )}
-                  
-                  {/* Document Footer */}
                   {Object.keys(formData).filter(key => formData[key] && String(formData[key]).trim()).length > 0 && (
                     <div className="mt-16 pt-8 border-t border-gray-200 text-center">
                       <p className="text-xs text-gray-400">
@@ -630,7 +565,7 @@ export const DynamicDocumentForm: React.FC<DynamicDocumentFormProps> = ({
             </div>
           </div>
         </div>
-      </div>
+      </div> 
     </div>
   );
 };

@@ -1,30 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  Plus,
-  ArrowLeft,
-  Loader2,
-  AlertCircle,
-  Sparkles,
-  Zap,
-  Star,
-  ChevronRight,
-  Layers,
-  FileText,
-  Crown,
-  Rocket,
-  Shield,
-  Users,
-  Briefcase,
-  Award,
-  TrendingUp
+  Plus, ArrowLeft, Loader2, AlertCircle, Sparkles, Zap, Star, ChevronRight, Layers, FileText, Crown, Rocket, Shield, Users, Briefcase, Award, TrendingUp
 } from "lucide-react";
 import { getDocumentTypes } from "../../endpoints/userDocument/getDocumentTypes";
 import { getDocumentTypeById } from "../../endpoints/userDocument/getDocumentTypeById";
-import {
-  Card,
-  CardContent,
-} from "../../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import DynamicDocumentForm from "../../components/forms/DynamicDocumentForm";
@@ -67,105 +48,40 @@ export default function CreateDocument() {
   });
 
   const documentTypes = documentTypesResponse?.data || [];
-  
-  const handleCancel = () => {
-    setSelectedDocumentId(null);
-  };
+  const handleCancel = () => setSelectedDocumentId(null);
 
-  // Group document types by category for better organization
+  // Group document types by category
   const groupedDocumentTypes = documentTypes.reduce((acc, docType) => {
     const category = docType.category || "Available Document Templates";
-    if (!acc[category]) {
-      acc[category] = [];
-    }
+    if (!acc[category]) acc[category] = [];
     acc[category].push(docType);
     return acc;
   }, {} as Record<string, DocumentType[]>);
 
   const categoryConfig = {
-    "Legal": {
-      gradient: "from-red-500 via-rose-500 to-pink-500",
-      icon: Shield,
-      bgGradient: "from-red-50 to-pink-50",
-      description: "Legal documents and agreements"
-    },
-    "HR": {
-      gradient: "from-blue-500 via-cyan-500 to-teal-500",
-      icon: Users,
-      bgGradient: "from-blue-50 to-cyan-50",
-      description: "Human resources documentation"
-    },
-    "Business": {
-      gradient: "from-green-500 via-emerald-500 to-teal-500",
-      icon: TrendingUp,
-      bgGradient: "from-green-50 to-emerald-50",
-      description: "Business operations and processes"
-    },
-    "Employment": {
-      gradient: "from-purple-500 via-indigo-500 to-blue-500",
-      icon: Briefcase,
-      bgGradient: "from-purple-50 to-indigo-50",
-      description: "Employment-related documents"
-    },
-    "professional": {
-      gradient: "from-orange-500 via-amber-500 to-yellow-500",
-      icon: Award,
-      bgGradient: "from-orange-50 to-amber-50",
-      description: "Professional certifications and documents"
-    },
-    "Available Document Templates": {
-      gradient: "from-gray-500 via-slate-500 to-zinc-500",
-      icon: FileText,
-      bgGradient: "from-gray-50 to-slate-50",
-      description: "General document templates"
-    }
+    "Legal": { gradient: "from-red-500 via-rose-500 to-pink-500", icon: Shield, bgGradient: "from-red-50 to-pink-50", description: "Legal documents and agreements" },
+    "HR": { gradient: "from-blue-500 via-cyan-500 to-teal-500", icon: Users, bgGradient: "from-blue-50 to-cyan-50", description: "Human resources documentation" },
+    "Business": { gradient: "from-green-500 via-emerald-500 to-teal-500", icon: TrendingUp, bgGradient: "from-green-50 to-emerald-50", description: "Business operations and processes" },
+    "Employment": { gradient: "from-purple-500 via-indigo-500 to-blue-500", icon: Briefcase, bgGradient: "from-purple-50 to-indigo-50", description: "Employment-related documents" },
+    "professional": { gradient: "from-orange-500 via-amber-500 to-yellow-500", icon: Award, bgGradient: "from-orange-50 to-amber-50", description: "Professional certifications and documents" },
+    "Available Document Templates": { gradient: "from-gray-500 via-slate-500 to-zinc-500", icon: FileText, bgGradient: "from-gray-50 to-slate-50", description: "General document templates" }
   };
-
-  const getCategoryConfig = (category: string) => {
-    return categoryConfig[category as keyof typeof categoryConfig] || categoryConfig["Available Document Templates"];
-  };
-
+  const getCategoryConfig = (category: string) => categoryConfig[category as keyof typeof categoryConfig] || categoryConfig["Available Document Templates"];
   const getDocumentIcon = (type: string) => {
     const normalizedType = type.toLowerCase();
-    
-    if (normalizedType.includes("nda") || normalizedType.includes("non-disclosure")) {
-      return "🔐";
-    } else if (normalizedType.includes("offer letter") || normalizedType.includes("offer")) {
-      return "💼";
-    } else if (normalizedType.includes("resignation") || normalizedType.includes("regination")) {
-      return "📤";
-    } else if (normalizedType.includes("service agreement") || normalizedType.includes("service")) {
-      return "🤝";
-    } else if (normalizedType.includes("experience certificate") || normalizedType.includes("experience")) {
-      return "🎓";
-    } else if (normalizedType.includes("recommendation") || normalizedType.includes("reference")) {
-      return "⭐";
-    } else {
-      return "📄";
-    }
+    if (normalizedType.includes("nda") || normalizedType.includes("non-disclosure")) return "🔐";
+    if (normalizedType.includes("offer letter") || normalizedType.includes("offer")) return "💼";
+    if (normalizedType.includes("resignation") || normalizedType.includes("regination")) return "📤";
+    if (normalizedType.includes("service agreement") || normalizedType.includes("service")) return "🤝";
+    if (normalizedType.includes("experience certificate") || normalizedType.includes("experience")) return "🎓";
+    if (normalizedType.includes("recommendation") || normalizedType.includes("reference")) return "⭐";
+    return "📄";
   };
+  const handleDocumentTypeSelect = (docType: DocumentType) => setSelectedDocumentId(docType.id);
+  const handleBackToSelection = () => setSelectedDocumentId(null);
+  const handleFormSubmit = (formData: Record<string, any>) => { console.log('Form submitted:', formData); };
+  const handleSaveDraft = (formData: Record<string, any>) => { console.log('Draft saved:', formData); };
 
-  const handleDocumentTypeSelect = (documentType: DocumentType) => {
-    setSelectedDocumentId(documentType.id);
-    console.log(`Selected Document Type: ${documentType.name}`);
-    console.log(`Document Type ID: ${documentType.id}`);
-  };
-
-  const handleBackToSelection = () => {
-    setSelectedDocumentId(null);
-  };
-
-  const handleFormSubmit = (formData: Record<string, any>) => {
-    console.log('Form submitted:', formData);
-    // Here you would typically send the data to your API
-    // Example: createDocument(formData)
-  };
-
-  const handleSaveDraft = (formData: Record<string, any>) => {
-    console.log('Draft saved:', formData);
-  };
-
-  // Loading state for document types
   if (isLoadingTypes) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -184,8 +100,6 @@ export default function CreateDocument() {
       </div>
     );
   }
-
-  // Error state for document types
   if (typesError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
@@ -195,10 +109,7 @@ export default function CreateDocument() {
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-3">Oops! Something went wrong</h3>
           <p className="text-gray-600 mb-8 text-lg">Unable to load document templates. Let's try again!</p>
-          <Button 
-            onClick={() => refetchTypes()} 
-            className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-          >
+          <Button onClick={() => refetchTypes()} className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <Rocket className="h-5 w-5 mr-2" />
             Try Again
           </Button>
@@ -226,7 +137,6 @@ export default function CreateDocument() {
                 </p>
               </div>
             </div>
-            
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
@@ -264,7 +174,6 @@ export default function CreateDocument() {
               </div>
             </div>
           </div>
-
           {/* Document Types Grid */}
           {documentTypes.length === 0 ? (
             <div className="text-center py-24">
@@ -281,7 +190,6 @@ export default function CreateDocument() {
               {Object.entries(groupedDocumentTypes).map(([category, types]) => {
                 const config = getCategoryConfig(category);
                 const IconComponent = config.icon;
-                
                 return (
                   <div key={category} className="space-y-8">
                     {/* Category Header */}
@@ -302,13 +210,12 @@ export default function CreateDocument() {
                         </Badge>
                       </div>
                     </div>
-
                     {/* Document Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                       {types.map((docType) => (
                         <Card
                           key={docType.id}
-                          className="group cursor-pointer border-2 border-gray-200 hover:border-indigo-400 hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden transform hover:scale-105 hover:-translate-y-1"
+                          className="group cursor-pointer border-2 border-gray-200 hover:border-indigo-400 hover:shadow-[0_8px_32px_0_rgba(99,102,241,0.24),_0_2px_8px_0_rgba(80,80,120,0.12)] transition-all duration-300 bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden transform hover:scale-105 hover:-translate-y-1"
                           onClick={() => handleDocumentTypeSelect(docType)}
                         >
                           <CardContent className="p-8">
@@ -316,9 +223,6 @@ export default function CreateDocument() {
                               <div className="relative">
                                 <div className={`w-20 h-20 bg-gradient-to-r ${config.bgGradient} rounded-2xl flex items-center justify-center text-4xl shadow-lg group-hover:shadow-xl transition-all duration-300`}>
                                   {getDocumentIcon(docType.name)}
-                                </div>
-                                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                                  <Sparkles className="h-4 w-4 text-white" />
                                 </div>
                               </div>
                               <div className="space-y-3">
@@ -368,8 +272,6 @@ export default function CreateDocument() {
       </div>
     );
   }
-
-  // Error state for document details
   if (detailsError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
@@ -380,18 +282,11 @@ export default function CreateDocument() {
           <h3 className="text-2xl font-bold text-gray-900 mb-3">Failed to load form</h3>
           <p className="text-gray-600 mb-8 text-lg">Unable to load the document template details</p>
           <div className="flex gap-4">
-            <Button 
-              onClick={() => refetchDetails()} 
-              className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
+            <Button onClick={() => refetchDetails()} className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <Rocket className="h-5 w-5 mr-2" />
               Try Again
             </Button>
-            <Button 
-              onClick={handleBackToSelection} 
-              variant="outline"
-              className="border-2 border-gray-300 hover:border-gray-400 px-6 py-3 rounded-xl font-semibold transition-all duration-300"
-            >
+            <Button onClick={handleBackToSelection} variant="outline" className="border-2 border-gray-300 hover:border-gray-400 px-6 py-3 rounded-xl font-semibold transition-all duration-300">
               <ArrowLeft className="h-5 w-5 mr-2" />
               Go Back
             </Button>
@@ -430,7 +325,6 @@ export default function CreateDocument() {
             </div>
           </div>
         </div>
-
         {/* Dynamic Form Container */}
         <div className="backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
           {documentTypeDetails?.data?.fields ? (
