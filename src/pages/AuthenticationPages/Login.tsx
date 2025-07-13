@@ -9,13 +9,15 @@ import type { LoginFormData } from '../../lib/validations/auth';
 import { Input } from '../../components/ui/form-field';
 import { loginUser } from '../../endpoints/login/login';
 import { toast } from 'sonner'; 
-import { useAuthStore } from '../../states/authStore'; // Import your auth store
+import { useAuthStore } from '../../states/authStore';
 
 export default function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const { setAuth } = useAuthStore();
+  // Get auth state and setAuth function from your store
+  const { setAuth, token, user } = useAuthStore();
+
   const {
     register,
     handleSubmit,
@@ -24,21 +26,19 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   });
 
- const { mutate, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: loginUser,
     onSuccess: (response) => {
       const { userWithoutPassword, token, message } = response;
-      
       if (userWithoutPassword && token) {
-        setAuth(userWithoutPassword,token);
-        localStorage.setItem('token', token); // Store token in localStorage
+        setAuth(userWithoutPassword, token);
         toast.success(message || 'Login successful!');
         setTimeout(() => {
           navigate('/dashboard');
         }, 1000);
       }
     },
-    onError: (error:any) => {
+    onError: (error: any) => {
       toast.error(error?.response?.data?.error || 'Login failed. Please try again.');
     }
   });
@@ -46,13 +46,13 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     mutate(data);
   };
+
+  // Check auth state from store, not localStorage
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (token && user) {
       navigate('/dashboard');
     }
-  }, [navigate]);
-
+  }, [token, user, navigate]);
 
   return (
     <div className="min-h-screen flex">
@@ -69,8 +69,6 @@ export default function Login() {
               Sign in to your account to continue
             </p>
           </div>
-
-
           {/* Form */}
           <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">

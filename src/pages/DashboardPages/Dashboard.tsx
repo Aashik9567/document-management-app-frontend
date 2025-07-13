@@ -2,12 +2,7 @@ import { useAuthStore } from "../../states/authStore";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import QuickActions from "../../components/dashboard/QuickActions";
 import RecentActivity from "../../components/dashboard/RecentActivity";
-import {
-  Calendar,
-  FileText,
-  Sparkles,
-  ChevronRight,
-} from "lucide-react";
+import { Calendar, FileText, Sparkles, ChevronRight } from "lucide-react";
 import UserDocument from "../../components/dashboard/UserDocument";
 
 export default function Dashboard() {
@@ -110,7 +105,7 @@ export default function Dashboard() {
 
           {/* Recent Activity - Enhanced */}
           <div className="xl:col-span-1">
-              <RecentActivity />
+            <RecentActivity />
           </div>
         </div>
 

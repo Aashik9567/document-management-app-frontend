@@ -1,13 +1,15 @@
 import { apiClient } from '../apiClient';
 import type { GetUserDocumentsResponse } from '../../types/document';
+import { useAuthStore } from '../../states/authStore';
 
 export const getUserDocuments = async (): Promise<GetUserDocumentsResponse> => {
   try {
-    const token = localStorage.getItem('token'); // Retrieve token from local storage
-    const response = await apiClient.get<GetUserDocumentsResponse>('/api/user-documents',{
+    const { token } = useAuthStore.getState(); // Get token from store
+    if (!token) throw new Error('No authentication token found');
+    const response = await apiClient.get<GetUserDocumentsResponse>('/api/user-documents', {
       headers: {
-        Authorization: `Bearer ${token}`, // Include token in the request headers
-      }, 
+        Authorization: `Bearer ${token}`,
+      },
     });
     return response.data;
   } catch (error: any) {

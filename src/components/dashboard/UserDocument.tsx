@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   FileText,
@@ -31,6 +31,7 @@ import {
 import { Button } from "../../components/ui/button";
 import type { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../states/authStore";
 
 interface DocumentType {
   id: string;
@@ -72,18 +73,30 @@ export default function UserDocument() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
   const queryClient = useQueryClient();
+  const { user, isAuthenticated, token } = useAuthStore();
+ 
+
+
 
   const {
     data: documentsResponse,
     isLoading,
+    isRefetching,
     error,
-    refetch,
+    refetch: refetchUserDocuments,
   } = useQuery({
     queryKey: ["user-documents"],
     queryFn: getUserDocuments,
     retry: 1,
     staleTime: 5 * 60 * 1000,
   });
+
+
+  useEffect(() => {
+    refetchUserDocuments();
+  },[user, isAuthenticated, token]);
+
+
   const { mutate: deleteDocument, isPending: isDeleting } = useMutation({
     mutationFn: deleteUserDocument,
     onSuccess: () => {
@@ -138,7 +151,7 @@ export default function UserDocument() {
     { value: "archived", label: "Archived", count: documents.filter((d) => d.status.toLowerCase() === "archived").length },
   ];
 
-  if (isLoading) {
+  if (isLoading || isRefetching) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl">
         <div className="p-8">
@@ -165,7 +178,7 @@ export default function UserDocument() {
               {error instanceof Error ? error.message : "Something went wrong while fetching your documents"}
             </p>
             <button
-              onClick={() => refetch()}
+              onClick={() => refetchUserDocuments()}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
             >
               Try Again
