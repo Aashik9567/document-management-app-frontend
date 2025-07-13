@@ -9,7 +9,8 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { token, user, setUser, logout, isAuthenticated } = useAuthStore();
+  const {  user, setUser, logout, isAuthenticated } = useAuthStore();
+  const token = localStorage.getItem('token');
 
   // Redirect immediately if no token
   if (!token) return <Navigate to="/login" replace />;
@@ -23,7 +24,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   } = useQuery({
     queryKey: ['get-user'],
     queryFn: getProfile,
-    enabled: !!token && !user,
+    enabled: !!token ,
     retry: false,
   });
 
@@ -39,10 +40,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }, [isError, logout]);
 
   useEffect(() => {
-    if (token && isAuthenticated && !user) {
+    if (token) {
       refetch();
     }
-  }, [token, isAuthenticated, user, refetch]);
+  }, [token, refetch]);
 
   if (isLoading || isRefetching) {
     return (
@@ -52,7 +53,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (isError || !user) {
+  if (isError || !user  ) {
     return <Navigate to="/login" replace />;
   }
 

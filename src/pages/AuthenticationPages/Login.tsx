@@ -30,6 +30,7 @@ export default function Login() {
     mutationFn: loginUser,
     onSuccess: (response) => {
       const { userWithoutPassword, token, message } = response;
+      localStorage.setItem('token', token);
       if (userWithoutPassword && token) {
         setAuth(userWithoutPassword, token);
         toast.success(message || 'Login successful!');

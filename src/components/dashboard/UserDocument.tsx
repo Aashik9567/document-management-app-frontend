@@ -73,7 +73,8 @@ export default function UserDocument() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, token } = useAuthStore();
+  const { user, isAuthenticated} = useAuthStore();
+  const token = localStorage.getItem("token");
  
 
 

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 
 // Define the User type based on your API response
 interface User {
@@ -26,7 +25,6 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
     (set) => ({
       user: null,
       token: null,
@@ -35,7 +33,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user: User) => {
         set(() => ({
           user,
-          isAuthenticated: !!user,
+          isAuthenticated: true,
         }));
       },
       setAuth: (user: User, token: string) => {
@@ -53,10 +51,5 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
         });
       },
-    }),
-    {
-      name: 'auth-storage',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
+    })
 );

@@ -1,4 +1,4 @@
-import { useAuthStore } from "../../states/authStore";
+
 import { apiClient } from "../apiClient";
 
 export interface ProfileResponse {
@@ -18,8 +18,7 @@ export interface ProfileResponse {
 }
 
 export const getProfile = async (): Promise<ProfileResponse> => {
-  // Get token and setUser from the store
-  const { token} = useAuthStore.getState();
+  const token = localStorage.getItem("token");
 
   if (!token) {
     throw new Error("No authentication token found.");
