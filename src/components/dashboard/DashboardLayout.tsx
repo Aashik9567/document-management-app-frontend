@@ -54,7 +54,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-1.5 rounded-xl shadow-lg">
                   <FileText className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">DocuFlow</span>
+                <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">DocuMate</span>
               </div>
               <button
                 onClick={toggleMobile}
@@ -88,7 +88,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-1.5 rounded-xl shadow-lg">
                 <FileText className="h-6 w-6 text-white" />
               </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">DocuFlow</span>
+              <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">DocuMate</span>
             </div>
             <div className="w-9"></div>
           </div>

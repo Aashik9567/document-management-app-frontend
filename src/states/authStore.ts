@@ -21,7 +21,6 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   setUser: (user: User) => void;
-  setToken: (token: string) => void;
   setAuth: (user: User, token: string) => void;
   logout: () => void;
 }
@@ -39,13 +38,6 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: !!user,
         }));
       },
-
-      setToken: (token: string) => {
-        set(() => ({
-          token,
-        }));
-      },
-
       setAuth: (user: User, token: string) => {
         set({
           user,
