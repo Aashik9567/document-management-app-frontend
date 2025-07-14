@@ -1,19 +1,21 @@
-import { apiClient } from '../apiClient';
-import type { GetUserDocumentsResponse } from '../../types/document';
-import { useAuthStore } from '../../states/authStore';
+import { apiClient } from "../apiClient";
+import type { GetUserDocumentsResponse } from "../../types/document";
 
 export const getUserDocuments = async (): Promise<GetUserDocumentsResponse> => {
   try {
-    const { token } = useAuthStore.getState(); // Get token from store
-    if (!token) throw new Error('No authentication token found');
-    const response = await apiClient.get<GetUserDocumentsResponse>('/api/user-documents', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+    const response = await apiClient.get<GetUserDocumentsResponse>(
+      "/api/user-documents",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error: any) {
-    console.error('Get user documents error:', error);
+    console.error("Get user documents error:", error);
     throw error;
   }
 };

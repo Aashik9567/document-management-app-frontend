@@ -69,14 +69,13 @@ const docIcons = {
 export default function UserDocument() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<"all" | "draft" | "completed" | "archived">("all");
+  const [selectedFilter, setSelectedFilter] = useState<
+    "all" | "draft" | "completed" | "archived"
+  >("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name">("newest");
   const queryClient = useQueryClient();
   const { user, isAuthenticated, token } = useAuthStore();
- 
-
-
 
   const {
     data: documentsResponse,
@@ -91,11 +90,9 @@ export default function UserDocument() {
     staleTime: 5 * 60 * 1000,
   });
 
-
   useEffect(() => {
     refetchUserDocuments();
-  },[user, isAuthenticated, token]);
-
+  }, [user, isAuthenticated, token]);
 
   const { mutate: deleteDocument, isPending: isDeleting } = useMutation({
     mutationFn: deleteUserDocument,
@@ -106,18 +103,22 @@ export default function UserDocument() {
       setDocumentToDelete(null);
     },
     onError: (error: AxiosError<any>) => {
-      const errorMessage = error.response?.data?.message || "Failed to delete document";
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete document";
       toast.error(errorMessage);
     },
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
+    null
+  );
 
   const handleDeleteClick = (doc: Document) => {
     setDocumentToDelete(doc);
     setDeleteDialogOpen(true);
   };
-  const confirmDelete = () => documentToDelete && deleteDocument(documentToDelete.id);
+  const confirmDelete = () =>
+    documentToDelete && deleteDocument(documentToDelete.id);
   const cancelDelete = () => {
     setDeleteDialogOpen(false);
     setDocumentToDelete(null);
@@ -126,29 +127,57 @@ export default function UserDocument() {
   const documents: Document[] = documentsResponse?.data || [];
 
   const filteredDocuments = documents.filter((doc) => {
-    const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase())
-      || doc.documentType.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === "all" || doc.status.toLowerCase() === selectedFilter;
+    const matchesSearch =
+      doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doc.documentType.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      selectedFilter === "all" || doc.status.toLowerCase() === selectedFilter;
     return matchesSearch && matchesFilter;
   });
 
   const sortedDocuments = [...filteredDocuments].sort((a, b) => {
     switch (sortBy) {
-      case "newest": return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      case "oldest": return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      case "name": return a.title.localeCompare(b.title);
-      default: return 0;
+      case "newest":
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      case "oldest":
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      case "name":
+        return a.title.localeCompare(b.title);
+      default:
+        return 0;
     }
   });
 
   const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
 
   const filterOptions = [
     { value: "all", label: "All Documents", count: documents.length },
-    { value: "draft", label: "Drafts", count: documents.filter((d) => d.status.toLowerCase() === "draft").length },
-    { value: "completed", label: "Completed", count: documents.filter((d) => d.status.toLowerCase() === "completed").length },
-    { value: "archived", label: "Archived", count: documents.filter((d) => d.status.toLowerCase() === "archived").length },
+    {
+      value: "draft",
+      label: "Drafts",
+      count: documents.filter((d) => d.status.toLowerCase() === "draft").length,
+    },
+    {
+      value: "completed",
+      label: "Completed",
+      count: documents.filter((d) => d.status.toLowerCase() === "completed")
+        .length,
+    },
+    {
+      value: "archived",
+      label: "Archived",
+      count: documents.filter((d) => d.status.toLowerCase() === "archived")
+        .length,
+    },
   ];
 
   if (isLoading || isRefetching) {
@@ -158,7 +187,9 @@ export default function UserDocument() {
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded-lg w-1/3"></div>
             <div className="space-y-4">
-              {[...Array(6)].map((_, i) => (<div key={i} className="h-20 bg-gray-200 rounded-xl"></div>))}
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-20 bg-gray-200 rounded-xl"></div>
+              ))}
             </div>
           </div>
         </div>
@@ -173,9 +204,13 @@ export default function UserDocument() {
             <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-red-100 mb-6">
               <FileText className="h-10 w-10 text-red-500" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-2">Error loading documents</h4>
+            <h4 className="text-lg font-semibold text-gray-900 mb-2">
+              Error loading documents
+            </h4>
             <p className="text-sm text-gray-600 mb-4">
-              {error instanceof Error ? error.message : "Something went wrong while fetching your documents"}
+              {error instanceof Error
+                ? error.message
+                : "Something went wrong while fetching your documents"}
             </p>
             <button
               onClick={() => refetchUserDocuments()}
@@ -198,7 +233,9 @@ export default function UserDocument() {
               <FolderOpen className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-2xl font-extrabold text-gray-900">My Documents</h3>
+              <h3 className="text-2xl font-extrabold text-gray-900">
+                My Documents
+              </h3>
               <p className="text-base text-gray-500 mt-1">
                 {documents.length} document{documents.length !== 1 ? "s" : ""}
               </p>
@@ -248,15 +285,23 @@ export default function UserDocument() {
             <div className="flex rounded-xl border border-gray-200 overflow-hidden shadow-sm bg-gray-50">
               <button
                 onClick={() => setViewMode("grid")}
-                className={cn("p-2.5 transition-colors", viewMode === "grid"
-                  ? "bg-blue-500 text-white" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100")}
+                className={cn(
+                  "p-2.5 transition-colors",
+                  viewMode === "grid"
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                )}
               >
                 <Grid3X3 className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={cn("p-2.5 transition-colors", viewMode === "list"
-                  ? "bg-blue-500 text-white" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100")}
+                className={cn(
+                  "p-2.5 transition-colors",
+                  viewMode === "list"
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                )}
               >
                 <List className="h-4 w-4" />
               </button>
@@ -272,7 +317,9 @@ export default function UserDocument() {
               <FileText className="h-12 w-12 text-gray-400" />
             </div>
             <h4 className="text-xl font-semibold text-gray-900 mb-2">
-              {searchTerm || selectedFilter !== "all" ? "No documents found" : "No documents created"}
+              {searchTerm || selectedFilter !== "all"
+                ? "No documents found"
+                : "No documents created"}
             </h4>
             <p className="text-gray-600 mb-6 max-w-md">
               {searchTerm || selectedFilter !== "all"
@@ -285,9 +332,14 @@ export default function UserDocument() {
             </button>
           </div>
         ) : (
-          <div className={cn("grid gap-7",
-            viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"
-          )}>
+          <div
+            className={cn(
+              "grid gap-7",
+              viewMode === "grid"
+                ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+                : "grid-cols-1"
+            )}
+          >
             {sortedDocuments.map((doc) => (
               <div
                 key={doc.id}
@@ -297,7 +349,11 @@ export default function UserDocument() {
                 <div className="flex items-start justify-between p-6 border-b border-gray-100">
                   <div className="flex items-center gap-3 max-w-[75%]">
                     <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-2xl shadow">
-                      {docIcons[(doc.documentType.name || "").toLowerCase() as keyof typeof docIcons] || docIcons.default}
+                      {docIcons[
+                        (
+                          doc.documentType.name || ""
+                        ).toLowerCase() as keyof typeof docIcons
+                      ] || docIcons.default}
                     </div>
                     <div className="min-w-0 flex-1">
                       <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-base truncate">
@@ -312,7 +368,9 @@ export default function UserDocument() {
                     <div
                       className={cn(
                         "px-3 py-1.5 rounded-full text-xs font-semibold border whitespace-nowrap shadow",
-                        statusColors[doc.status.toLowerCase() as keyof typeof statusColors] || statusColors.default
+                        statusColors[
+                          doc.status.toLowerCase() as keyof typeof statusColors
+                        ] || statusColors.default
                       )}
                     >
                       {doc.status}
@@ -368,7 +426,11 @@ export default function UserDocument() {
                     }}
                     disabled={isDeleting}
                   >
-                    <Trash2 className={`h-5 w-5 ${isDeleting ? "text-gray-400" : "text-red-500"}`} />
+                    <Trash2
+                      className={`h-5 w-5 ${
+                        isDeleting ? "text-gray-400" : "text-red-500"
+                      }`}
+                    />
                   </button>
                 </div>
               </div>
@@ -398,7 +460,8 @@ export default function UserDocument() {
               <span className="font-medium text-gray-900">
                 "{documentToDelete?.title}"
               </span>
-              ? This will permanently remove the document and all its associated data.
+              ? This will permanently remove the document and all its associated
+              data.
             </p>
           </div>
           <DialogFooter className="flex gap-2">

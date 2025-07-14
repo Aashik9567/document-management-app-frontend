@@ -1,4 +1,3 @@
-import { useAuthStore } from "../../states/authStore";
 import { apiClient } from "../apiClient";
 
 export interface ProfileResponse {
@@ -17,23 +16,19 @@ export interface ProfileResponse {
   };
 }
 
-export const getProfile = async (): Promise<ProfileResponse> => {
-  // Get token and setUser from the store
-  const { token} = useAuthStore.getState();
+export const getProfile = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await apiClient.get<ProfileResponse>("api/auth/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!token) {
-    throw new Error("No authentication token found.");
-  }
-
-  const response = await apiClient.get<ProfileResponse>('api/auth/profile', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }
-  });
-
-  if (response.data.success) {
-    return response.data;
-  } else {
-    throw new Error(response.data.message || 'Failed to fetch profile.');
+    return response;
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error("An unexpected error occurred while fetching the profile.");
   }
 };

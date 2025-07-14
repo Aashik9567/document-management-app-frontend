@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Mail, Lock, FileText } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { loginSchema } from '../../lib/validations/auth';
-import type { LoginFormData } from '../../lib/validations/auth';
-import { Input } from '../../components/ui/form-field';
-import { loginUser } from '../../endpoints/login/login';
-import { toast } from 'sonner'; 
-import { useAuthStore } from '../../states/authStore';
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Mail, Lock, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { loginSchema } from "../../lib/validations/auth";
+import type { LoginFormData } from "../../lib/validations/auth";
+import { Input } from "../../components/ui/form-field";
+import { loginUser } from "../../endpoints/login/login";
+import { toast } from "sonner";
+import { useAuthStore } from "../../states/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -32,15 +32,18 @@ export default function Login() {
       const { userWithoutPassword, token, message } = response;
       if (userWithoutPassword && token) {
         setAuth(userWithoutPassword, token);
-        toast.success(message || 'Login successful!');
+        localStorage.setItem("token", token);
+        toast.success(message || "Login successful!");
         setTimeout(() => {
-          navigate('/dashboard');
-        }, 1000);
+          navigate("/dashboard");
+        }, 100);
       }
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.error || 'Login failed. Please try again.');
-    }
+      toast.error(
+        error?.response?.data?.error || "Login failed. Please try again."
+      );
+    },
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -50,7 +53,7 @@ export default function Login() {
   // Check auth state from store, not localStorage
   useEffect(() => {
     if (token && user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [token, user, navigate]);
 
@@ -64,7 +67,9 @@ export default function Login() {
             <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-xl bg-blue-100">
               <FileText className="h-6 w-6 text-blue-600" />
             </div>
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome back</h2>
+            <h2 className="mt-6 text-3xl font-bold text-gray-900">
+              Welcome back
+            </h2>
             <p className="mt-2 text-sm text-gray-600">
               Sign in to your account to continue
             </p>
@@ -74,7 +79,10 @@ export default function Login() {
             <div className="space-y-4">
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Email address
                 </label>
                 <div className="relative">
@@ -82,21 +90,30 @@ export default function Login() {
                     <Mail className="h-5 w-5 text-gray-400" />
                   </div>
                   <Input
-                    {...register('email')}
+                    {...register("email")}
                     type="email"
                     autoComplete="email"
-                    className={`pl-10 ${errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 ${
+                      errors.email
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                        : ""
+                    }`}
                     placeholder="Enter your email"
                   />
                 </div>
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -104,10 +121,14 @@ export default function Login() {
                     <Lock className="h-5 w-5 text-gray-400" />
                   </div>
                   <Input
-                    {...register('password')}
-                    type={showPassword ? 'text' : 'password'}
+                    {...register("password")}
+                    type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
-                    className={`pl-10 pr-10 ${errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`pl-10 pr-10 ${
+                      errors.password
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                        : ""
+                    }`}
                     placeholder="Enter your password"
                   />
                   <button
@@ -123,7 +144,9 @@ export default function Login() {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -137,7 +160,10 @@ export default function Login() {
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   Remember me
                 </label>
               </div>
@@ -148,7 +174,7 @@ export default function Login() {
                   className="font-medium text-blue-600 hover:text-blue-500"
                   onClick={(e) => {
                     e.preventDefault();
-                    console.log('Forgot password clicked');
+                    console.log("Forgot password clicked");
                   }}
                 >
                   Forgot your password?
@@ -159,23 +185,23 @@ export default function Login() {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={isPending }
+              disabled={isPending}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {(isPending ) ? (
+              {isPending ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Signing in...
                 </div>
               ) : (
-                'Sign in'
+                "Sign in"
               )}
             </button>
 
             {/* Sign up link */}
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                Don't have an account?{" "}
                 <a
                   href="#"
                   className="font-medium text-blue-600 hover:text-blue-500"
@@ -196,10 +222,12 @@ export default function Login() {
         <div className="flex items-center justify-center h-full p-12">
           <div className="max-w-md text-center text-white">
             <FileText className="h-20 w-20 mx-auto mb-8" />
-            <h3 className="text-2xl font-bold mb-4">Document Management Made Simple</h3>
+            <h3 className="text-2xl font-bold mb-4">
+              Document Management Made Simple
+            </h3>
             <p className="text-blue-100">
-              Create, manage, and organize all your business documents in one place. 
-              From NDAs to offer letters, we've got you covered.
+              Create, manage, and organize all your business documents in one
+              place. From NDAs to offer letters, we've got you covered.
             </p>
           </div>
         </div>
